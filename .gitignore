@@ -1,0 +1,32 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+
+# Environment variables (never commit)
+.env
+.env.local
+.env.*.local
+
+# Prisma
+backend/prisma/migrations/*.sql.bak
+
+# Project tooling / docs (local only)
+.cursor/
+docs/
+openspec/
+AGENTS.md
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+.vscode/settings.json
+
+# Logs
+*.log
+npm-debug.log*
+
+# TypeScript
+*.tsbuildinfo
