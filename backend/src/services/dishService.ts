@@ -86,3 +86,20 @@ export async function updateDish(id: number, input: UpdateDishInput) {
 
   return prisma.dish.update({ where: { id }, data });
 }
+
+export async function adjustStock(id: number, delta: number) {
+  const dish = await prisma.dish.findUnique({ where: { id } });
+  if (!dish) {
+    throw new AppError("NOT_FOUND", 404, "המנה לא נמצאה");
+  }
+
+  const newQuantity = dish.quantity + delta;
+  if (newQuantity < 0) {
+    throw new AppError("VALIDATION_ERROR", 400, "לא ניתן להפחית מתחת ל-0");
+  }
+
+  return prisma.dish.update({
+    where: { id },
+    data: { quantity: newQuantity },
+  });
+}
