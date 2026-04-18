@@ -34,13 +34,32 @@ All docs are in `/docs`:
 
 ---
 
-## Getting Started (Local) — Planned
-Local setup scripts are **planned but not implemented yet**:
-- `backend/prisma/seed.ts` — seed mock data
-- `setup.js` — bootstrap script
-- `docker-compose.yml` — local Postgres (optional)
+## Getting Started (Local)
 
-Until then, setup instructions will be added later.
+Requires [Docker Desktop](https://www.docker.com/products/docker-desktop/) to be installed and running.
+
+```bash
+# 1. Start local Postgres
+docker compose up -d
+
+# 2. Copy env file (DATABASE_URL is pre-filled for Docker)
+cp .env.example .env
+
+# 3. Install dependencies
+npm install
+
+# 4. Run database migrations
+npm run --workspace=backend prisma migrate dev
+
+# 5. Start frontend + backend together
+npm run dev
+```
+
+| Service | URL |
+|---|---|
+| Frontend | http://localhost:5173 |
+| Backend API | http://localhost:3000/api |
+| Postgres | localhost:5432 |
 
 ---
 
