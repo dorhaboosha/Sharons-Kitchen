@@ -6,7 +6,10 @@
   "scripts": {
     "dev": "ts-node src/server.ts",
     "build": "tsc",
-    "start": "node dist/server.js"
+    "start": "node dist/server.js",
+    "migrate": "dotenv -e ../.env -- prisma migrate dev",
+    "migrate:deploy": "dotenv -e ../.env -- prisma migrate deploy",
+    "prisma:studio": "dotenv -e ../.env -- prisma studio"
   },
   "dependencies": {
     "@prisma/client": "^6.6.0",
@@ -21,6 +24,7 @@
     "@types/node": "^22.0.0",
     "prisma": "^6.6.0",
     "ts-node": "^10.9.2",
-    "typescript": "^5.7.0"
+    "typescript": "^5.7.0",
+    "dotenv-cli": "^8.0.0"
   }
 }
