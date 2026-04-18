@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import { errorHandler } from "./middlewares/errorHandler";
 
 const app = express();
 
@@ -9,6 +10,9 @@ app.use(express.json());
 app.get("/api/health", (_req, res) => {
   res.json({ success: true, data: { status: "ok" } });
 });
+
+
+app.use(errorHandler);
 
 const PORT = Number(process.env.PORT) || 3000;
 app.listen(PORT, () => {
