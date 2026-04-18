@@ -1,6 +1,7 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "../prisma/client";
 import { AppError } from "../utils/AppError";
+import { normalizeName, CreateDishInput } from "@sharons-kitchen/shared";
 
 export type FilterParam = "active" | "inactive" | "all";
 export type SortByParam = "name" | "quantity";
@@ -45,4 +46,23 @@ export async function getDishById(id: number) {
   }
 
   return dish;
+}
+
+export async function createDish(input: CreateDishInput) {
+  const name = normalizeName(input.name);
+
+  const existing = await prisma.dish.findUnique({ where: { name } });
+  if (existing) {
+    throw new AppError("CONFLICT", 409, "כבר קיימת מנה בשם הזה");
+  }
+
+  return prisma.dish.create({
+    data: {
+      name,
+      price: input.price,
+      quantity: input.quantity,
+      unitsPerBox: input.unitsPerBox ?? null,
+      description: input.description ?? null,
+    },
+  });
 }
