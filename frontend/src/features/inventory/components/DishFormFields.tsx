@@ -37,6 +37,23 @@ export function DishFormFields({ register, errors }: DishFormFieldsProps) {
         </NumberInput>
         <FormErrorMessage>{errors.quantity?.message}</FormErrorMessage>
       </FormControl>
+
+      <FormControl isInvalid={!!errors.unitsPerBox}>
+        <FormLabel>יחידות בקופסה (אופציונלי)</FormLabel>
+        <NumberInput min={1} precision={0}>
+          <NumberInputField
+            {...register("unitsPerBox", { valueAsNumber: true })}
+            placeholder="לדוגמה: 6"
+          />
+        </NumberInput>
+        <FormErrorMessage>{errors.unitsPerBox?.message}</FormErrorMessage>
+      </FormControl>
+
+      <FormControl isInvalid={!!errors.description}>
+        <FormLabel>תיאור (אופציונלי)</FormLabel>
+        <Input {...register("description")} placeholder="לדוגמה: קציצות ברוטב עגבניות" />
+        <FormErrorMessage>{errors.description?.message}</FormErrorMessage>
+      </FormControl>
     </>
   );
 }
