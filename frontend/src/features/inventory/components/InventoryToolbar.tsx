@@ -2,6 +2,7 @@ import { Box, Button, Flex } from "@chakra-ui/react";
 import { GetDishesQueryData } from "@sharons-kitchen/shared";
 import { SearchBar } from "./SearchBar";
 import { FilterButtons } from "./FilterButtons";
+import { SortControls } from "./SortControls";
 
 interface InventoryToolbarProps {
   search: string;
@@ -32,7 +33,12 @@ export function InventoryToolbar({search, onSearchChange, filter, onFilterChange
 
         {/* SortControls (task 8.7) */}
         <Box>
-          {/* <SortControls sortBy={sortBy} sortOrder={sortOrder} onChangeSortBy={onSortByChange} onChangeSortOrder={onSortOrderChange} /> */}
+          <SortControls
+            sortBy={sortBy}
+            sortOrder={sortOrder}
+            onChangeSortBy={onSortByChange}
+            onChangeSortOrder={onSortOrderChange}
+          />
         </Box>
       </Flex>
 
