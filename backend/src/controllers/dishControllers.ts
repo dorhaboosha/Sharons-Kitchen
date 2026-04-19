@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
-import { getDishes, getDishById, createDish, updateDish, FilterParam, SortByParam, SortOrderParam } from "../services/dishService";
+import { getDishes, getDishById, createDish, updateDish, adjustStock, FilterParam, SortByParam, SortOrderParam } from "../services/dishService";
 import { sendSuccess } from "../utils/response";
-import { CreateDishData, UpdateDishData } from "@sharons-kitchen/shared";
+import { CreateDishData, UpdateDishData, AdjustStockData } from "@sharons-kitchen/shared";
 
 export async function getDishesController(
   req: Request,
@@ -59,6 +59,20 @@ export async function updateDishController(
   try {
     const id = Number(req.params.id);
     const dish = await updateDish(id, req.body as UpdateDishData);
+    sendSuccess(res, dish);
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function adjustStockController(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const id = Number(req.params.id);
+    const dish = await adjustStock(id, (req.body as AdjustStockData).delta);
     sendSuccess(res, dish);
   } catch (err) {
     next(err);
