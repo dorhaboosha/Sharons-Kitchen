@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import { errorHandler } from "./middlewares/errorHandler";
+import dishesRouter from "./routes/dishes";
 
 const app = express();
 
@@ -11,6 +12,7 @@ app.get("/api/health", (_req, res) => {
   res.json({ success: true, data: { status: "ok" } });
 });
 
+app.use("/api/dishes", dishesRouter);
 
 app.use(errorHandler);
 
