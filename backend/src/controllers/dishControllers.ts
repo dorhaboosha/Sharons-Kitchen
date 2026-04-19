@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { getDishes, FilterParam, SortByParam, SortOrderParam } from "../services/dishService";
+import { getDishes, getDishById, FilterParam, SortByParam, SortOrderParam } from "../services/dishService";
 import { sendSuccess } from "../utils/response";
 
 export async function getDishesController(
@@ -18,6 +18,20 @@ export async function getDishesController(
     });
 
     sendSuccess(res, dishes);
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function getDishByIdController(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const id = Number(req.params.id);
+    const dish = await getDishById(id);
+    sendSuccess(res, dish);
   } catch (err) {
     next(err);
   }
