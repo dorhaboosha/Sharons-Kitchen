@@ -1,6 +1,7 @@
 import { Box, Button, Flex } from "@chakra-ui/react";
 import { GetDishesQueryData } from "@sharons-kitchen/shared";
 import { SearchBar } from "./SearchBar";
+import { FilterButtons } from "./FilterButtons";
 
 interface InventoryToolbarProps {
   search: string;
@@ -26,7 +27,7 @@ export function InventoryToolbar({search, onSearchChange, filter, onFilterChange
 
         {/* FilterButtons (task 8.6) */}
         <Box>
-          {/* <FilterButtons value={filter} onChange={onFilterChange} /> */}
+          <FilterButtons value={filter} onChange={onFilterChange} />
         </Box>
 
         {/* SortControls (task 8.7) */}
