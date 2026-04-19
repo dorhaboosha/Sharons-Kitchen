@@ -1,11 +1,11 @@
 import { Router } from "express";
-import { validate } from "../middlewares/validate";
-import { CreateDishSchema, UpdateDishSchema, AdjustStockSchema } from "@sharons-kitchen/shared";
+import { validate, validateQuery } from "../middlewares/validate";
+import { CreateDishSchema, UpdateDishSchema, AdjustStockSchema, GetDishesQuerySchema } from "@sharons-kitchen/shared";
 import { getDishesController, getDishByIdController, createDishController, updateDishController, adjustStockController } from "../controllers/dishControllers";
 
 const router = Router();
 
-router.get("/", getDishesController);
+router.get("/", validateQuery(GetDishesQuerySchema), getDishesController);
 router.get("/:id", getDishByIdController);
 router.post("/", validate(CreateDishSchema), createDishController);
 router.patch("/:id", validate(UpdateDishSchema), updateDishController);

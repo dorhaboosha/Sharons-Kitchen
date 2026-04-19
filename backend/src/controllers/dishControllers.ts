@@ -1,19 +1,12 @@
 import { Request, Response, NextFunction } from "express";
-import { getDishes, getDishById, createDish, updateDish, adjustStock, FilterParam, SortByParam, SortOrderParam } from "../services/dishService";
+import { getDishes, getDishById, createDish, updateDish, adjustStock } from "../services/dishService";
 import { sendSuccess } from "../utils/response";
-import { CreateDishData, UpdateDishData, AdjustStockData } from "@sharons-kitchen/shared";
+import { CreateDishData, UpdateDishData, AdjustStockData, GetDishesQueryData } from "@sharons-kitchen/shared";
 
 export async function getDishesController(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const { filter, search, sortBy, sortOrder } = req.query;
-
-    const dishes = await getDishes({
-      filter: filter as FilterParam | undefined,
-      search: search as string | undefined,
-      sortBy: sortBy as SortByParam | undefined,
-      sortOrder: sortOrder as SortOrderParam | undefined,
-    });
-
+    const query = res.locals.query as GetDishesQueryData;
+    const dishes = await getDishes(query);
     sendSuccess(res, dishes);
   }
   catch (err) {

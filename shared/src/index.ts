@@ -13,5 +13,8 @@ export type { UpdateDishData } from "./schemas/updateDish";
 export { AdjustStockSchema } from "./schemas/adjustStock";
 export type { AdjustStockData } from "./schemas/adjustStock";
 
+export { GetDishesQuerySchema } from "./schemas/getDishesQuery";
+export type { GetDishesQueryData } from "./schemas/getDishesQuery";
+
 // Utils
 export { normalizeName } from "./utils/normalizeName";
