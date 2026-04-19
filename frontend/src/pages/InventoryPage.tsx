@@ -22,7 +22,8 @@ export function InventoryPage() {
       <InventoryToolbar search={search} onSearchChange={setSearch} filter={filter} onFilterChange={setFilter} sortBy={sortBy}
         onSortByChange={setSortBy} sortOrder={sortOrder} onSortOrderChange={setSortOrder} onAddClick={() => {/* open CreateDishModal — task 9.3 */}} />
 
-      <InventoryTable dishes={dishes} />
+      <InventoryTable dishes={dishes} onEdit={() => {/* open EditDishModal — task 9.8 */}} onDelete={() => {/* open DeleteConfirmDialog — task 9.8 */}}
+        onRestore={() => {/* open EditDishModal (restore) — task 9.8 */}} />
     </Box>
   );
 }

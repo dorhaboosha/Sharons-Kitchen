@@ -1,9 +1,12 @@
-import { Dish } from "@sharons-kitchen/shared";
-import { Table, Thead, Tbody, Tr, Th, Td, TableContainer, Text, Box } from "@chakra-ui/react";
+import { Dish, DishId } from "@sharons-kitchen/shared";
+import { Table, Thead, Tbody, Tr, Th, Td, TableContainer, Text, HStack, Button } from "@chakra-ui/react";
 import { StockIndicator } from "./StockIndicator";
 
 interface InventoryTableProps {
   dishes: Dish[];
+  onEdit: (dish: Dish) => void;
+  onDelete: (id: DishId) => void;
+  onRestore: (dish: Dish) => void;
 }
 
 const COLUMNS = [
@@ -16,7 +19,7 @@ const COLUMNS = [
   { key: "actions", label: "פעולות" },
 ] as const;
 
-export function InventoryTable({ dishes }: InventoryTableProps) {
+export function InventoryTable({ dishes, onEdit, onDelete, onRestore }: InventoryTableProps) {
   return (
     <TableContainer borderWidth={1} borderRadius="md" borderColor="gray.200">
       <Table variant="simple" size="md" dir="rtl">
@@ -52,8 +55,20 @@ export function InventoryTable({ dishes }: InventoryTableProps) {
                   <StockIndicator quantity={dish.quantity} />
                 </Td>
                 <Td textAlign="right">
-                  {/* Row action buttons — task 8.11 */}
-                  <Box />
+                  <HStack spacing={2} justify="flex-end">
+                    <Button size="sm" variant="outline" onClick={() => onEdit(dish)}>
+                      עריכה
+                    </Button>
+                    {dish.isActive ? (
+                      <Button size="sm" variant="outline" colorScheme="red" onClick={() => onDelete(dish.id)}>
+                        מחיקה
+                      </Button>
+                    ) : (
+                      <Button size="sm" variant="outline" colorScheme="teal" onClick={() => onRestore(dish)}>
+                        שחזור
+                      </Button>
+                    )}
+                  </HStack>
                 </Td>
               </Tr>
             ))
