@@ -15,7 +15,7 @@ export function InventoryPage() {
   const [sortBy, setSortBy] = useState<GetDishesQueryData["sortBy"]>(undefined);
   const [sortOrder, setSortOrder] = useState<GetDishesQueryData["sortOrder"]>("asc");
 
-  const { data: dishes = [] } = useInventory({ search, filter, sortBy, sortOrder });
+  const { data: dishes = [], isLoading } = useInventory({ search, filter, sortBy, sortOrder });
 
   const createModal = useDisclosure();
   const editModal = useDisclosure();
@@ -68,7 +68,7 @@ export function InventoryPage() {
         sortBy={sortBy} onSortByChange={setSortBy} sortOrder={sortOrder} onSortOrderChange={setSortOrder}
         onAddClick={createModal.onOpen} />
 
-      <InventoryTable dishes={dishes} onEdit={handleEdit} onDelete={handleDelete} onRestore={handleEdit} onAdjustStock={handleAdjustStock} />
+      <InventoryTable dishes={dishes} isLoading={isLoading} onEdit={handleEdit} onDelete={handleDelete} onRestore={handleEdit} onAdjustStock={handleAdjustStock} />
 
       <CreateDishModal isOpen={createModal.isOpen} onClose={createModal.onClose} />
 

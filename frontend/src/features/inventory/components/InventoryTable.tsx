@@ -1,9 +1,12 @@
 import { Dish, DishId } from "@sharons-kitchen/shared";
-import { Table, Thead, Tbody, Tr, Th, Td, TableContainer, Text, HStack, Button } from "@chakra-ui/react";
+import { Table, Thead, Tbody, Tr, Th, Td, TableContainer, Text, HStack, Button, Skeleton } from "@chakra-ui/react";
 import { StockIndicator } from "./StockIndicator";
+
+const SKELETON_ROWS = 5;
 
 interface InventoryTableProps {
   dishes: Dish[];
+  isLoading?: boolean;
   onEdit: (dish: Dish) => void;
   onDelete: (id: DishId) => void;
   onRestore: (dish: Dish) => void;
@@ -20,7 +23,7 @@ const COLUMNS = [
   { key: "actions", label: "פעולות" },
 ] as const;
 
-export function InventoryTable({ dishes, onEdit, onDelete, onRestore, onAdjustStock }: InventoryTableProps) {
+export function InventoryTable({ dishes, isLoading = false, onEdit, onDelete, onRestore, onAdjustStock }: InventoryTableProps) {
   return (
     <TableContainer borderWidth={1} borderRadius="md" borderColor="gray.200">
       <Table variant="simple" size="md" dir="rtl">
@@ -34,7 +37,17 @@ export function InventoryTable({ dishes, onEdit, onDelete, onRestore, onAdjustSt
           </Tr>
         </Thead>
         <Tbody>
-          {dishes.length === 0 ? (
+          {isLoading ? (
+            Array.from({ length: SKELETON_ROWS }).map((_, i) => (
+              <Tr key={i}>
+                {COLUMNS.map((col) => (
+                  <Td key={col.key}>
+                    <Skeleton height="20px" borderRadius="md" />
+                  </Td>
+                ))}
+              </Tr>
+            ))
+          ) : dishes.length === 0 ? (
             <Tr>
               <Td colSpan={COLUMNS.length} textAlign="center" py={10}>
                 <Text color="gray.400">אין מנות להצגה</Text>
