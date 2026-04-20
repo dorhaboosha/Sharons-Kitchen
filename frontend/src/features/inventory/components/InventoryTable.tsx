@@ -12,14 +12,28 @@ interface InventoryTableProps {
   onDelete: (id: DishId) => void;
   onRestore: (dish: Dish) => void;
   onAdjustStock: (dish: Dish) => void;
+  onClearFilters?: () => void;
 }
 
-function EmptyState({ hasActiveFilters }: { hasActiveFilters: boolean }) {
+function EmptyState({ hasActiveFilters, onClearFilters }: { hasActiveFilters: boolean; onClearFilters?: () => void }) {
   if (hasActiveFilters) {
     return (
       <Tr>
-        <Td colSpan={COLUMNS.length} textAlign="center" py={10}>
-          <Text color="gray.400">אין מנות התואמות את הסינון הנוכחי</Text>
+        <Td colSpan={COLUMNS.length} py={16}>
+          <VStack spacing={3} align="center">
+            <Box fontSize="4xl" lineHeight={1}>🔍</Box>
+            <Text fontWeight="semibold" fontSize="lg" color="gray.600">
+              לא נמצאו תוצאות
+            </Text>
+            <Text fontSize="sm" color="gray.400">
+              אין מנות התואמות את החיפוש או הסינון הנוכחי.
+            </Text>
+            {onClearFilters && (
+              <Button size="sm" variant="outline" onClick={onClearFilters}>
+                נקה סינון
+              </Button>
+            )}
+          </VStack>
         </Td>
       </Tr>
     );
@@ -52,7 +66,7 @@ const COLUMNS = [
   { key: "actions", label: "פעולות" },
 ] as const;
 
-export function InventoryTable({ dishes, isLoading = false, hasActiveFilters = false, onEdit, onDelete, onRestore, onAdjustStock }: InventoryTableProps) {
+export function InventoryTable({ dishes, isLoading = false, hasActiveFilters = false, onEdit, onDelete, onRestore, onAdjustStock, onClearFilters }: InventoryTableProps) {
   return (
     <TableContainer borderWidth={1} borderRadius="md" borderColor="gray.200">
       <Table variant="simple" size="md" dir="rtl">
@@ -77,7 +91,7 @@ export function InventoryTable({ dishes, isLoading = false, hasActiveFilters = f
               </Tr>
             ))
           ) : dishes.length === 0 ? (
-            <EmptyState hasActiveFilters={hasActiveFilters} />
+            <EmptyState hasActiveFilters={hasActiveFilters} onClearFilters={onClearFilters} />
           ) : (
             dishes.map((dish) => (
               <Tr key={dish.id} opacity={dish.isActive ? 1 : 0.5} _hover={{ bg: "gray.50" }}>

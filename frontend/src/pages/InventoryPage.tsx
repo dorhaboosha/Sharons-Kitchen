@@ -19,6 +19,13 @@ export function InventoryPage() {
 
   const hasActiveFilters = Boolean(search) || (filter !== undefined && filter !== "all") || Boolean(sortBy);
 
+  function handleClearFilters() {
+    setSearch("");
+    setFilter("all");
+    setSortBy(undefined);
+    setSortOrder("asc");
+  }
+
   const createModal = useDisclosure();
   const editModal = useDisclosure();
   const deleteDialog = useDisclosure();
@@ -70,7 +77,7 @@ export function InventoryPage() {
         sortBy={sortBy} onSortByChange={setSortBy} sortOrder={sortOrder} onSortOrderChange={setSortOrder}
         onAddClick={createModal.onOpen} />
 
-      <InventoryTable dishes={dishes} isLoading={isLoading} hasActiveFilters={hasActiveFilters} onEdit={handleEdit} onDelete={handleDelete} onRestore={handleEdit} onAdjustStock={handleAdjustStock} />
+      <InventoryTable dishes={dishes} isLoading={isLoading} hasActiveFilters={hasActiveFilters} onEdit={handleEdit} onDelete={handleDelete} onRestore={handleEdit} onAdjustStock={handleAdjustStock} onClearFilters={handleClearFilters} />
 
       <CreateDishModal isOpen={createModal.isOpen} onClose={createModal.onClose} />
 
