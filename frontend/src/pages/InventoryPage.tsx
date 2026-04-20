@@ -7,6 +7,7 @@ import { InventoryTable } from "../features/inventory/components/InventoryTable"
 import { CreateDishModal } from "../features/inventory/components/CreateDishModal";
 import { EditDishModal } from "../features/inventory/components/EditDishModal";
 import { DeleteConfirmDialog } from "../features/inventory/components/DeleteConfirmDialog";
+import { AdjustStockModal } from "../features/inventory/components/AdjustStockModal";
 
 export function InventoryPage() {
   const [search, setSearch] = useState("");
@@ -19,9 +20,11 @@ export function InventoryPage() {
   const createModal = useDisclosure();
   const editModal = useDisclosure();
   const deleteDialog = useDisclosure();
+  const adjustStockModal = useDisclosure();
 
   const [editingDish, setEditingDish] = useState<Dish | null>(null);
   const [deletingDish, setDeletingDish] = useState<{ id: DishId; name: string } | null>(null);
+  const [adjustingDish, setAdjustingDish] = useState<Dish | null>(null);
 
   function handleEdit(dish: Dish) {
     setEditingDish(dish);
@@ -45,6 +48,16 @@ export function InventoryPage() {
     setDeletingDish(null);
   }
 
+  function handleAdjustStock(dish: Dish) {
+    setAdjustingDish(dish);
+    adjustStockModal.onOpen();
+  }
+
+  function handleAdjustStockClose() {
+    adjustStockModal.onClose();
+    setAdjustingDish(null);
+  }
+
   return (
     <Box maxW="1200px" mx="auto" px={6} py={8} dir="rtl">
       <Heading size="lg" mb={6}>
@@ -55,13 +68,15 @@ export function InventoryPage() {
         sortBy={sortBy} onSortByChange={setSortBy} sortOrder={sortOrder} onSortOrderChange={setSortOrder}
         onAddClick={createModal.onOpen} />
 
-      <InventoryTable dishes={dishes} onEdit={handleEdit} onDelete={handleDelete} onRestore={handleEdit} />
+      <InventoryTable dishes={dishes} onEdit={handleEdit} onDelete={handleDelete} onRestore={handleEdit} onAdjustStock={handleAdjustStock} />
 
       <CreateDishModal isOpen={createModal.isOpen} onClose={createModal.onClose} />
 
       <EditDishModal dish={editingDish} isOpen={editModal.isOpen} onClose={handleEditClose} />
 
       <DeleteConfirmDialog dishId={deletingDish?.id ?? null} dishName={deletingDish?.name ?? ""} isOpen={deleteDialog.isOpen} onClose={handleDeleteClose} />
+
+      <AdjustStockModal dish={adjustingDish} isOpen={adjustStockModal.isOpen} onClose={handleAdjustStockClose} />
     </Box>
   );
 }

@@ -7,6 +7,7 @@ interface InventoryTableProps {
   onEdit: (dish: Dish) => void;
   onDelete: (id: DishId) => void;
   onRestore: (dish: Dish) => void;
+  onAdjustStock: (dish: Dish) => void;
 }
 
 const COLUMNS = [
@@ -19,7 +20,7 @@ const COLUMNS = [
   { key: "actions", label: "פעולות" },
 ] as const;
 
-export function InventoryTable({ dishes, onEdit, onDelete, onRestore }: InventoryTableProps) {
+export function InventoryTable({ dishes, onEdit, onDelete, onRestore, onAdjustStock }: InventoryTableProps) {
   return (
     <TableContainer borderWidth={1} borderRadius="md" borderColor="gray.200">
       <Table variant="simple" size="md" dir="rtl">
@@ -58,6 +59,9 @@ export function InventoryTable({ dishes, onEdit, onDelete, onRestore }: Inventor
                   <HStack spacing={2} justify="flex-end">
                     <Button size="sm" variant="outline" onClick={() => onEdit(dish)}>
                       עריכה
+                    </Button>
+                    <Button size="sm" variant="outline" colorScheme="blue" onClick={() => onAdjustStock(dish)}>
+                      מלאי
                     </Button>
                     {dish.isActive ? (
                       <Button size="sm" variant="outline" colorScheme="red" onClick={() => onDelete(dish.id)}>
