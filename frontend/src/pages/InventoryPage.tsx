@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { Box, Heading, useDisclosure } from "@chakra-ui/react";
-import { GetDishesQueryData } from "@sharons-kitchen/shared";
+import { DishId, GetDishesQueryData } from "@sharons-kitchen/shared";
 import { useInventory } from "../features/inventory/hooks/useInventory";
 import { InventoryToolbar } from "../features/inventory/components/InventoryToolbar";
 import { InventoryTable } from "../features/inventory/components/InventoryTable";
 import { CreateDishModal } from "../features/inventory/components/CreateDishModal";
+import { DeleteConfirmDialog } from "../features/inventory/components/DeleteConfirmDialog";
 
 export function InventoryPage() {
   const [search, setSearch] = useState("");
@@ -15,6 +16,21 @@ export function InventoryPage() {
   const { data: dishes = [] } = useInventory({ search, filter, sortBy, sortOrder });
 
   const createModal = useDisclosure();
+  const deleteDialog = useDisclosure();
+
+  const [deletingDish, setDeletingDish] = useState<{ id: DishId; name: string } | null>(null);
+
+  function handleDelete(id: DishId) {
+    const dish = dishes.find((d) => d.id === id);
+    if (!dish) return;
+    setDeletingDish({ id: dish.id, name: dish.name });
+    deleteDialog.onOpen();
+  }
+
+  function handleDeleteClose() {
+    deleteDialog.onClose();
+    setDeletingDish(null);
+  }
 
   return (
     <Box maxW="1200px" mx="auto" px={6} py={8} dir="rtl">
@@ -27,10 +43,12 @@ export function InventoryPage() {
         onAddClick={createModal.onOpen} />
 
       <InventoryTable dishes={dishes} onEdit={() => {/* open EditDishModal — task 9.8 */}}
-        onDelete={() => {/* open DeleteConfirmDialog — task 9.8 */}} 
+        onDelete={handleDelete}
         onRestore={() => {/* open EditDishModal (restore) — task 9.8 */}} />
 
       <CreateDishModal isOpen={createModal.isOpen} onClose={createModal.onClose} />
+
+      <DeleteConfirmDialog dishId={deletingDish?.id ?? null} dishName={deletingDish?.name ?? ""} isOpen={deleteDialog.isOpen} onClose={handleDeleteClose} />
     </Box>
   );
 }
