@@ -1,10 +1,14 @@
 import { useEffect } from "react";
-import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, ModalCloseButton, Button, VStack, FormControl, 
-  FormLabel, Switch } from "@chakra-ui/react";
+import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, ModalCloseButton, Button, VStack, FormControl, FormLabel, 
+  Switch, useToast } from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Dish, UpdateDishSchema, UpdateDishData, CreateDishData } from "@sharons-kitchen/shared";
 import { DishFormFields } from "./DishFormFields";
+import { updateDish } from "../services/inventoryService";
+import { DISHES_QUERY_KEY } from "../hooks/useInventory";
+import { ApiClientError } from "../../../services/apiClient";
 import type { UseFormRegister, FieldErrors } from "react-hook-form";
 
 interface EditDishModalProps {
@@ -14,9 +18,36 @@ interface EditDishModalProps {
 }
 
 export function EditDishModal({ dish, isOpen, onClose }: EditDishModalProps) {
-  const { register, handleSubmit, reset, watch, setValue, formState: { errors, isSubmitting } } = useForm<UpdateDishData>({ resolver: zodResolver(UpdateDishSchema) });
+  const queryClient = useQueryClient();
+  const toast = useToast();
+
+  const { register, handleSubmit, reset, watch, setValue, setError, formState: { errors } } =
+    useForm<UpdateDishData>({ resolver: zodResolver(UpdateDishSchema) });
 
   const isActive = watch("isActive");
+
+  const mutation = useMutation({
+    mutationFn: (data: UpdateDishData) => updateDish(dish!.id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [DISHES_QUERY_KEY] });
+      handleClose();
+    },
+    onError: (err: unknown) => {
+      if (err instanceof ApiClientError && err.code === "CONFLICT") {
+        setError("name", { message: "כבר קיימת מנה בשם הזה" });
+      } 
+      else {
+        toast({
+          title: "שגיאה בשמירת המנה",
+          description: "אירעה שגיאה, נסה שנית",
+          status: "error",
+          duration: 4000,
+          isClosable: true,
+          position: "top",
+        });
+      }
+    },
+  });
 
   useEffect(() => {
     if (dish) {
@@ -36,8 +67,8 @@ export function EditDishModal({ dish, isOpen, onClose }: EditDishModalProps) {
     onClose();
   }
 
-  function onSubmit(_data: UpdateDishData) {
-    // PATCH mutation wired in task 9.6
+  function onSubmit(data: UpdateDishData) {
+    mutation.mutate(data);
   }
 
   return (
@@ -50,14 +81,15 @@ export function EditDishModal({ dish, isOpen, onClose }: EditDishModalProps) {
         <form onSubmit={handleSubmit(onSubmit)}>
           <ModalBody>
             <VStack spacing={4} align="stretch">
-              <DishFormFields
-                register={register as unknown as UseFormRegister<CreateDishData>}
-                errors={errors as FieldErrors<CreateDishData>}
-              />
+              <DishFormFields register={register as unknown as UseFormRegister<CreateDishData>} errors={errors as FieldErrors<CreateDishData>} />
 
               <FormControl display="flex" alignItems="center" gap={3}>
                 <FormLabel mb={0}>מנה פעילה</FormLabel>
-                <Switch isChecked={isActive ?? true} onChange={(e) => setValue("isActive", e.target.checked)} colorScheme="teal" />
+                <Switch
+                  isChecked={isActive ?? true}
+                  onChange={(e) => setValue("isActive", e.target.checked)}
+                  colorScheme="teal"
+                />
               </FormControl>
             </VStack>
           </ModalBody>
@@ -66,7 +98,7 @@ export function EditDishModal({ dish, isOpen, onClose }: EditDishModalProps) {
             <Button variant="ghost" onClick={handleClose}>
               ביטול
             </Button>
-            <Button type="submit" colorScheme="teal" isLoading={isSubmitting}>
+            <Button type="submit" colorScheme="teal" isLoading={mutation.isPending}>
               שמירה
             </Button>
           </ModalFooter>
