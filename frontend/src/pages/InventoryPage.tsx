@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { Box, Heading, useDisclosure } from "@chakra-ui/react";
-import { DishId, GetDishesQueryData } from "@sharons-kitchen/shared";
+import { Dish, DishId, GetDishesQueryData } from "@sharons-kitchen/shared";
 import { useInventory } from "../features/inventory/hooks/useInventory";
 import { InventoryToolbar } from "../features/inventory/components/InventoryToolbar";
 import { InventoryTable } from "../features/inventory/components/InventoryTable";
 import { CreateDishModal } from "../features/inventory/components/CreateDishModal";
+import { EditDishModal } from "../features/inventory/components/EditDishModal";
 import { DeleteConfirmDialog } from "../features/inventory/components/DeleteConfirmDialog";
 
 export function InventoryPage() {
@@ -16,9 +17,21 @@ export function InventoryPage() {
   const { data: dishes = [] } = useInventory({ search, filter, sortBy, sortOrder });
 
   const createModal = useDisclosure();
+  const editModal = useDisclosure();
   const deleteDialog = useDisclosure();
 
+  const [editingDish, setEditingDish] = useState<Dish | null>(null);
   const [deletingDish, setDeletingDish] = useState<{ id: DishId; name: string } | null>(null);
+
+  function handleEdit(dish: Dish) {
+    setEditingDish(dish);
+    editModal.onOpen();
+  }
+
+  function handleEditClose() {
+    editModal.onClose();
+    setEditingDish(null);
+  }
 
   function handleDelete(id: DishId) {
     const dish = dishes.find((d) => d.id === id);
@@ -42,11 +55,11 @@ export function InventoryPage() {
         sortBy={sortBy} onSortByChange={setSortBy} sortOrder={sortOrder} onSortOrderChange={setSortOrder}
         onAddClick={createModal.onOpen} />
 
-      <InventoryTable dishes={dishes} onEdit={() => {/* open EditDishModal — task 9.8 */}}
-        onDelete={handleDelete}
-        onRestore={() => {/* open EditDishModal (restore) — task 9.8 */}} />
+      <InventoryTable dishes={dishes} onEdit={handleEdit} onDelete={handleDelete} onRestore={handleEdit} />
 
       <CreateDishModal isOpen={createModal.isOpen} onClose={createModal.onClose} />
+
+      <EditDishModal dish={editingDish} isOpen={editModal.isOpen} onClose={handleEditClose} />
 
       <DeleteConfirmDialog dishId={deletingDish?.id ?? null} dishName={deletingDish?.name ?? ""} isOpen={deleteDialog.isOpen} onClose={handleDeleteClose} />
     </Box>
