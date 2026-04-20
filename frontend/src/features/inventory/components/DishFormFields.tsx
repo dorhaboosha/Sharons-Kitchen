@@ -19,10 +19,7 @@ export function DishFormFields({ register, errors }: DishFormFieldsProps) {
       <FormControl isInvalid={!!errors.price} isRequired>
         <FormLabel>מחיר (₪)</FormLabel>
         <NumberInput min={0} precision={0}>
-          <NumberInputField
-            {...register("price", { valueAsNumber: true })}
-            placeholder="0"
-          />
+          <NumberInputField {...register("price", { valueAsNumber: true })} placeholder="0" textAlign="right" />
         </NumberInput>
         <FormErrorMessage>{errors.price?.message}</FormErrorMessage>
       </FormControl>
@@ -30,10 +27,7 @@ export function DishFormFields({ register, errors }: DishFormFieldsProps) {
       <FormControl isInvalid={!!errors.quantity} isRequired>
         <FormLabel>כמות (קופסאות)</FormLabel>
         <NumberInput min={0} precision={0}>
-          <NumberInputField
-            {...register("quantity", { valueAsNumber: true })}
-            placeholder="0"
-          />
+          <NumberInputField {...register("quantity", { valueAsNumber: true })} placeholder="0" textAlign="right" />
         </NumberInput>
         <FormErrorMessage>{errors.quantity?.message}</FormErrorMessage>
       </FormControl>
@@ -41,10 +35,7 @@ export function DishFormFields({ register, errors }: DishFormFieldsProps) {
       <FormControl isInvalid={!!errors.unitsPerBox}>
         <FormLabel>יחידות בקופסה (אופציונלי)</FormLabel>
         <NumberInput min={1} precision={0}>
-          <NumberInputField
-            {...register("unitsPerBox", { valueAsNumber: true })}
-            placeholder="לדוגמה: 6"
-          />
+          <NumberInputField {...register("unitsPerBox", { valueAsNumber: true })} placeholder="לדוגמה: 6" textAlign="right" />
         </NumberInput>
         <FormErrorMessage>{errors.unitsPerBox?.message}</FormErrorMessage>
       </FormControl>

@@ -1,4 +1,4 @@
-import { Input, InputGroup, InputRightElement, Text } from "@chakra-ui/react";
+import { Input, InputGroup, InputLeftElement, Text } from "@chakra-ui/react";
 
 interface SearchBarProps {
   value: string;
@@ -8,10 +8,10 @@ interface SearchBarProps {
 export function SearchBar({ value, onChange }: SearchBarProps) {
   return (
     <InputGroup>
-      <Input value={value} onChange={(e) => onChange(e.target.value)} placeholder="חיפוש לפי שם מנה..." bg="white" />
-      <InputRightElement pointerEvents="none">
+      <InputLeftElement pointerEvents="none">
         <Text color="gray.400">🔍</Text>
-      </InputRightElement>
+      </InputLeftElement>
+      <Input value={value} onChange={(e) => onChange(e.target.value)} placeholder="חיפוש לפי שם מנה..." bg="white" />
     </InputGroup>
   );
 }
