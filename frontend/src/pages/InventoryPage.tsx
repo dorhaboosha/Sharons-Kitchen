@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { Box, Heading } from "@chakra-ui/react";
+import { Box, Heading, useDisclosure } from "@chakra-ui/react";
 import { GetDishesQueryData } from "@sharons-kitchen/shared";
 import { useInventory } from "../features/inventory/hooks/useInventory";
 import { InventoryToolbar } from "../features/inventory/components/InventoryToolbar";
 import { InventoryTable } from "../features/inventory/components/InventoryTable";
+import { CreateDishModal } from "../features/inventory/components/CreateDishModal";
 
 export function InventoryPage() {
   const [search, setSearch] = useState("");
@@ -13,17 +14,23 @@ export function InventoryPage() {
 
   const { data: dishes = [] } = useInventory({ search, filter, sortBy, sortOrder });
 
+  const createModal = useDisclosure();
+
   return (
     <Box maxW="1200px" mx="auto" px={6} py={8} dir="rtl">
       <Heading size="lg" mb={6}>
         מלאי
       </Heading>
 
-      <InventoryToolbar search={search} onSearchChange={setSearch} filter={filter} onFilterChange={setFilter} sortBy={sortBy}
-        onSortByChange={setSortBy} sortOrder={sortOrder} onSortOrderChange={setSortOrder} onAddClick={() => {/* open CreateDishModal — task 9.3 */}} />
+      <InventoryToolbar search={search} onSearchChange={setSearch} filter={filter} onFilterChange={setFilter}
+        sortBy={sortBy} onSortByChange={setSortBy} sortOrder={sortOrder} onSortOrderChange={setSortOrder}
+        onAddClick={createModal.onOpen} />
 
-      <InventoryTable dishes={dishes} onEdit={() => {/* open EditDishModal — task 9.8 */}} onDelete={() => {/* open DeleteConfirmDialog — task 9.8 */}}
+      <InventoryTable dishes={dishes} onEdit={() => {/* open EditDishModal — task 9.8 */}}
+        onDelete={() => {/* open DeleteConfirmDialog — task 9.8 */}} 
         onRestore={() => {/* open EditDishModal (restore) — task 9.8 */}} />
+
+      <CreateDishModal isOpen={createModal.isOpen} onClose={createModal.onClose} />
     </Box>
   );
 }
