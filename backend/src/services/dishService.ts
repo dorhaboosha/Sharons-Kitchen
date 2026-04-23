@@ -4,7 +4,7 @@ import { AppError } from "../utils/AppError";
 import { normalizeName, CreateDishInput, UpdateDishInput } from "@sharons-kitchen/shared";
 
 export type FilterParam = "active" | "inactive" | "all";
-export type SortByParam = "name" | "quantity";
+export type SortByParam = "name" | "quantity" | "price";
 export type SortOrderParam = "asc" | "desc";
 
 export interface GetDishesParams {
