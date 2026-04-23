@@ -27,8 +27,8 @@ export const theme = extendTheme({
     brand,
   },
   fonts: {
-    body: 'system-ui, sans-serif',
-    heading: 'system-ui, sans-serif',
+    body: "'Heebo', sans-serif",
+    heading: "'Heebo', sans-serif",
   },
   styles: {
     global: {
