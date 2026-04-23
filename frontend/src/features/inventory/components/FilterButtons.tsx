@@ -18,8 +18,12 @@ export function FilterButtons({ value = "all", onChange }: FilterButtonsProps) {
   return (
     <ButtonGroup isAttached variant="outline" size="md">
       {options.map((opt) => (
-        <Button key={opt.value} onClick={() => onChange(opt.value)} 
-          colorScheme={value === opt.value ? "teal" : "gray"} variant={value === opt.value ? "solid" : "outline"}>
+        <Button
+          key={opt.value}
+          onClick={() => onChange(opt.value)}
+          colorScheme="brand"
+          variant={value === opt.value ? "solid" : "outline"}
+        >
           {opt.label}
         </Button>
       ))}
