@@ -2,47 +2,36 @@ import { Box, Button, Flex } from "@chakra-ui/react";
 import { GetDishesQueryData } from "@sharons-kitchen/shared";
 import { SearchBar } from "./SearchBar";
 import { FilterButtons } from "./FilterButtons";
-import { SortControls } from "./SortControls";
+import { SortControls, SortValue } from "./SortControls";
 
 interface InventoryToolbarProps {
   search: string;
   onSearchChange: (value: string) => void;
   filter: GetDishesQueryData["filter"];
   onFilterChange: (value: GetDishesQueryData["filter"]) => void;
-  sortBy: GetDishesQueryData["sortBy"];
-  onSortByChange: (value: GetDishesQueryData["sortBy"]) => void;
-  sortOrder: GetDishesQueryData["sortOrder"];
-  onSortOrderChange: (value: GetDishesQueryData["sortOrder"]) => void;
+  sort: SortValue;
+  onSortChange: (value: SortValue) => void;
   onAddClick: () => void;
 }
 
-export function InventoryToolbar({search, onSearchChange, filter, onFilterChange, sortBy, onSortByChange, sortOrder, onSortOrderChange, onAddClick}: InventoryToolbarProps) {
+export function InventoryToolbar({ search, onSearchChange, filter, onFilterChange, sort, onSortChange, onAddClick }: InventoryToolbarProps) {
   return (
     <Flex mb={4} gap={3} wrap="wrap" align="center" justify="space-between">
       {/* Right group: search + filter + sort */}
       <Flex gap={3} wrap="wrap" align="center" flex={1}>
-        {/* SearchBar (task 8.5) */}
         <Box flex={1} minW="200px">
           <SearchBar value={search} onChange={onSearchChange} />
         </Box>
 
-        {/* FilterButtons (task 8.6) */}
         <Box>
           <FilterButtons value={filter} onChange={onFilterChange} />
         </Box>
 
-        {/* SortControls (task 8.7) */}
         <Box>
-          <SortControls
-            sortBy={sortBy}
-            sortOrder={sortOrder}
-            onChangeSortBy={onSortByChange}
-            onChangeSortOrder={onSortOrderChange}
-          />
+          <SortControls sort={sort} onSortChange={onSortChange} />
         </Box>
       </Flex>
 
-      {/* Left: Add dish button (modal wired in task 9.3) */}
       <Button colorScheme="brand" flexShrink={0} onClick={onAddClick}>
         הוספת מנה
       </Button>

@@ -8,22 +8,26 @@ import { CreateDishModal } from "../features/inventory/components/CreateDishModa
 import { EditDishModal } from "../features/inventory/components/EditDishModal";
 import { DeleteConfirmDialog } from "../features/inventory/components/DeleteConfirmDialog";
 import { AdjustStockModal } from "../features/inventory/components/AdjustStockModal";
+import { SortValue } from "../features/inventory/components/SortControls";
 
 export function InventoryPage() {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<GetDishesQueryData["filter"]>("all");
-  const [sortBy, setSortBy] = useState<GetDishesQueryData["sortBy"]>(undefined);
-  const [sortOrder, setSortOrder] = useState<GetDishesQueryData["sortOrder"]>("asc");
+  const [sort, setSort] = useState<SortValue>("");
+
+  // Split combined sort value ("name:asc") into separate API params before querying
+  const [sortBy, sortOrder] = sort
+    ? (sort.split(":") as [GetDishesQueryData["sortBy"], GetDishesQueryData["sortOrder"]])
+    : [undefined, "asc" as const];
 
   const { data: dishes = [], isLoading } = useInventory({ search, filter, sortBy, sortOrder });
 
-  const hasActiveFilters = Boolean(search) || (filter !== undefined && filter !== "all") || Boolean(sortBy);
+  const hasActiveFilters = Boolean(search) || (filter !== undefined && filter !== "all") || Boolean(sort);
 
   function handleClearFilters() {
     setSearch("");
     setFilter("all");
-    setSortBy(undefined);
-    setSortOrder("asc");
+    setSort("");
   }
 
   const createModal = useDisclosure();
@@ -74,7 +78,7 @@ export function InventoryPage() {
       </Heading>
 
       <InventoryToolbar search={search} onSearchChange={setSearch} filter={filter} onFilterChange={setFilter}
-        sortBy={sortBy} onSortByChange={setSortBy} sortOrder={sortOrder} onSortOrderChange={setSortOrder}
+        sort={sort} onSortChange={setSort}
         onAddClick={createModal.onOpen} />
 
       <InventoryTable dishes={dishes} isLoading={isLoading} hasActiveFilters={hasActiveFilters} onEdit={handleEdit} onDelete={handleDelete} onRestore={handleEdit} onAdjustStock={handleAdjustStock} onClearFilters={handleClearFilters} />

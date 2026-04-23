@@ -1,35 +1,38 @@
-import { Flex, Select } from "@chakra-ui/react";
-import { GetDishesQueryData } from "@sharons-kitchen/shared";
+import { Select } from "@chakra-ui/react";
+
+export type SortValue =
+  | ""
+  | "name:asc"
+  | "name:desc"
+  | "quantity:asc"
+  | "quantity:desc"
+  | "price:asc"
+  | "price:desc";
+
+const SORT_OPTIONS: { value: SortValue; label: string }[] = [
+  { value: "",             label: "מיון לפי..." },
+  { value: "name:asc",     label: "שם: א→ת" },
+  { value: "name:desc",    label: "שם: ת→א" },
+  { value: "quantity:asc", label: "כמות: נמוך→גבוה" },
+  { value: "quantity:desc",label: "כמות: גבוה→נמוך" },
+  { value: "price:asc",    label: "מחיר: נמוך→גבוה" },
+  { value: "price:desc",   label: "מחיר: גבוה→נמוך" },
+];
 
 interface SortControlsProps {
-  sortBy: GetDishesQueryData["sortBy"];
-  sortOrder: GetDishesQueryData["sortOrder"];
-  onChangeSortBy: (value: GetDishesQueryData["sortBy"]) => void;
-  onChangeSortOrder: (value: GetDishesQueryData["sortOrder"]) => void;
+  sort: SortValue;
+  onSortChange: (value: SortValue) => void;
 }
 
-export function SortControls({sortBy, sortOrder = "asc", onChangeSortBy, onChangeSortOrder }: SortControlsProps) {
+export function SortControls({ sort, onSortChange }: SortControlsProps) {
   return (
-    <Flex gap={2}>
-      <Select size="md" bg="white" value={sortBy ?? ""}
-        onChange={(e) => {
-          const val = e.target.value;
-          onChangeSortBy(val === "" ? undefined : (val as GetDishesQueryData["sortBy"]));
-        }}
-        w="auto" minW="140px">
-        <option value="">מיון לפי...</option>
-        <option value="name">שם</option>
-        <option value="quantity">כמות</option>
-      </Select>
-
-      <Select size="md" bg="white" value={sortOrder}
-        onChange={(e) =>
-          onChangeSortOrder(e.target.value as GetDishesQueryData["sortOrder"])
-        }
-        w="auto" minW="110px" isDisabled={!sortBy}>
-        <option value="asc">א ← ת / נמוך → גבוה</option>
-        <option value="desc">ת ← א / גבוה → נמוך</option>
-      </Select>
-    </Flex>
+    <Select size="md" bg="white" color="gray.800" value={sort}
+      onChange={(e) => onSortChange(e.target.value as SortValue)} w="auto" minW="170px">
+      {SORT_OPTIONS.map((opt) => (
+        <option key={opt.value} value={opt.value}>
+          {opt.label}
+        </option>
+      ))}
+    </Select>
   );
 }
