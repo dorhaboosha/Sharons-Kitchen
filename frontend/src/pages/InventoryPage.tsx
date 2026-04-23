@@ -73,7 +73,7 @@ export function InventoryPage() {
 
   return (
     <Box maxW="1200px" mx="auto" px={6} py={8} dir="rtl">
-      <Heading size="lg" mb={6}>
+      <Heading size="2xl" textAlign="center" mb={8}>
         מלאי
       </Heading>
 
