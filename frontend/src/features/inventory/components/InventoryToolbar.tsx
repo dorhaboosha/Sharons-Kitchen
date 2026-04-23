@@ -43,7 +43,7 @@ export function InventoryToolbar({search, onSearchChange, filter, onFilterChange
       </Flex>
 
       {/* Left: Add dish button (modal wired in task 9.3) */}
-      <Button colorScheme="teal" flexShrink={0} onClick={onAddClick}>
+      <Button colorScheme="brand" flexShrink={0} onClick={onAddClick}>
         הוספת מנה
       </Button>
     </Flex>

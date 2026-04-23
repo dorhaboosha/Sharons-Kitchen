@@ -70,7 +70,7 @@ export function CreateDishModal({ isOpen, onClose }: CreateDishModalProps) {
             <Button variant="ghost" onClick={handleClose}>
               ביטול
             </Button>
-            <Button type="submit" colorScheme="teal" isLoading={mutation.isPending}>
+            <Button type="submit" colorScheme="brand" isLoading={mutation.isPending}>
               שמירה
             </Button>
           </ModalFooter>

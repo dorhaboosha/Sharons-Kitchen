@@ -112,7 +112,7 @@ export function InventoryTable({ dishes, isLoading = false, hasActiveFilters = f
                     <Button size="sm" variant="outline" onClick={() => onEdit(dish)}>
                       עריכה
                     </Button>
-                    <Button size="sm" variant="outline" colorScheme="blue" onClick={() => onAdjustStock(dish)}>
+                    <Button size="sm" variant="outline" colorScheme="brand" onClick={() => onAdjustStock(dish)}>
                       מלאי
                     </Button>
                     {dish.isActive ? (
@@ -120,7 +120,7 @@ export function InventoryTable({ dishes, isLoading = false, hasActiveFilters = f
                         מחיקה
                       </Button>
                     ) : (
-                      <Button size="sm" variant="outline" colorScheme="teal" onClick={() => onRestore(dish)}>
+                      <Button size="sm" variant="outline" colorScheme="brand" onClick={() => onRestore(dish)}>
                         שחזור
                       </Button>
                     )}

@@ -30,6 +30,13 @@ export const theme = extendTheme({
     body: 'system-ui, sans-serif',
     heading: 'system-ui, sans-serif',
   },
+  styles: {
+    global: {
+      body: {
+        bg: 'brand.50',
+      },
+    },
+  },
   components: {
     Heading: {
       baseStyle: {

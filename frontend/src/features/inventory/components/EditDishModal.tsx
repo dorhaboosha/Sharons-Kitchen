@@ -88,7 +88,7 @@ export function EditDishModal({ dish, isOpen, onClose }: EditDishModalProps) {
                 <Switch
                   isChecked={isActive ?? true}
                   onChange={(e) => setValue("isActive", e.target.checked)}
-                  colorScheme="teal"
+                  colorScheme="brand"
                 />
               </FormControl>
             </VStack>
@@ -98,7 +98,7 @@ export function EditDishModal({ dish, isOpen, onClose }: EditDishModalProps) {
             <Button variant="ghost" onClick={handleClose}>
               ביטול
             </Button>
-            <Button type="submit" colorScheme="teal" isLoading={mutation.isPending}>
+            <Button type="submit" colorScheme="brand" isLoading={mutation.isPending}>
               שמירה
             </Button>
           </ModalFooter>
