@@ -46,9 +46,9 @@ export function DishFormFields({ register, errors }: DishFormFieldsProps) {
       </FormControl>
 
       <FormControl isInvalid={!!errors.quantity} isRequired>
-        <FormLabel {...LABEL_STYLES}>כמות (קופסאות)</FormLabel>
-        <NumberInput min={0} precision={0} dir="ltr">
-          <NumberInputField {...register("quantity", { valueAsNumber: true })} placeholder="0" textAlign="right" {...INPUT_STYLES} />
+        <FormLabel {...LABEL_STYLES}>כמות (קופסאות) — לפחות 1</FormLabel>
+        <NumberInput min={1} precision={0} dir="ltr">
+          <NumberInputField {...register("quantity", { valueAsNumber: true })} placeholder="1" textAlign="right" {...INPUT_STYLES} />
           <NumberInputStepper border="none">
             <NumberIncrementStepper {...STEPPER_STYLES} />
             <NumberDecrementStepper {...STEPPER_STYLES} />

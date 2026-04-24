@@ -9,7 +9,7 @@ export const CreateDishSchema = z.object({
   quantity: z
     .number({ invalid_type_error: "הכמות חייבת להיות מספר" })
     .int("הכמות חייבת להיות מספר שלם")
-    .min(0, "הכמות לא יכולה להיות שלילית"),
+    .min(1, "הכמות חייבת להיות לפחות 1"),
   unitsPerBox: z
     .number({ invalid_type_error: "יחידות בקופסה חייב להיות מספר" })
     .int("יחידות בקופסה חייב להיות מספר שלם")
