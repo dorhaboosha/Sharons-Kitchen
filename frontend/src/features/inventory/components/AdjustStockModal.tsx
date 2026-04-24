@@ -78,31 +78,34 @@ export function AdjustStockModal({ dish, isOpen, onClose }: AdjustStockModalProp
   return (
     <Modal isOpen={isOpen} onClose={handleClose} closeOnOverlayClick={false}>
       <ModalOverlay />
-      <ModalContent dir="rtl">
-        <ModalHeader>עדכון מלאי{dish ? ` — ${dish.name}` : ""}</ModalHeader>
-        <ModalCloseButton />
+      <ModalContent dir="rtl" bg="brand.50" color="gray.800" borderRadius="xl" overflow="hidden">
+        <ModalHeader bg="brand.200" color="#2C1810" textAlign="center" fontSize="xl" fontWeight="bold"
+          borderBottom="2px solid" borderBottomColor="gray.400">
+          עדכון מלאי 📦{dish ? ` — ${dish.name}` : ""}
+        </ModalHeader>
+        <ModalCloseButton color="#2C1810" />
 
         <form onSubmit={handleSubmit(onSubmit)}>
-          <ModalBody>
+          <ModalBody pt={5}>
             <VStack spacing={5} align="stretch">
               <Text fontSize="sm" color="gray.600">
                 כמות נוכחית: <strong>{dish?.quantity ?? 0}</strong>
               </Text>
 
               <FormControl>
-                <FormLabel>פעולה</FormLabel>
+                <FormLabel color="gray.700">פעולה</FormLabel>
                 <Controller
                   name="direction"
                   control={control}
                   render={({ field }) => (
                     <ButtonGroup isAttached variant="outline" w="full">
-                      <Button flex={1} colorScheme={field.value === "add" ? "teal" : "gray"} variant={field.value === "add" ? "solid" : "outline"}
+                      <Button flex={1} colorScheme="green" variant={field.value === "add" ? "solid" : "outline"} 
                         onClick={() => field.onChange("add")} type="button">
-                        הוספה +
+                        הוספה
                       </Button>
-                      <Button flex={1} colorScheme={field.value === "subtract" ? "red" : "gray"} variant={field.value === "subtract" ? "solid" : "outline"}
+                      <Button flex={1} colorScheme="red" variant={field.value === "subtract" ? "solid" : "outline"}
                         onClick={() => field.onChange("subtract")} type="button">
-                        הפחתה −
+                        הפחתה
                       </Button>
                     </ButtonGroup>
                   )}
@@ -110,16 +113,19 @@ export function AdjustStockModal({ dish, isOpen, onClose }: AdjustStockModalProp
               </FormControl>
 
               <FormControl isInvalid={!!errors.amount}>
-                <FormLabel>כמות {direction === "add" ? "להוספה" : "להפחתה"}</FormLabel>
+                <FormLabel color="gray.700">כמות {direction === "add" ? "להוספה" : "להפחתה"}</FormLabel>
                 <Controller
                   name="amount"
                   control={control}
                   render={({ field }) => (
-                    <NumberInput min={1} value={field.value} onChange={(_, valueAsNumber) => field.onChange(isNaN(valueAsNumber) ? 1 : valueAsNumber)}>
-                      <NumberInputField textAlign="right" />
-                      <NumberInputStepper>
-                        <NumberIncrementStepper />
-                        <NumberDecrementStepper />
+                    <NumberInput min={1} value={field.value}
+                      onChange={(_, valueAsNumber) => field.onChange(isNaN(valueAsNumber) ? 1 : valueAsNumber)} dir="ltr">
+                      <NumberInputField textAlign="right" bg="white" color="gray.800" borderColor="gray.500"
+                        borderWidth="2px" _hover={{ borderColor: "gray.700" }}
+                        _focusVisible={{ borderColor: "gray.700", boxShadow: "none" }} />
+                      <NumberInputStepper border="none">
+                        <NumberIncrementStepper border="none" color="gray.600" _hover={{ bg: "transparent" }} />
+                        <NumberDecrementStepper border="none" color="gray.600" _hover={{ bg: "transparent" }} />
                       </NumberInputStepper>
                     </NumberInput>
                   )}
@@ -131,11 +137,11 @@ export function AdjustStockModal({ dish, isOpen, onClose }: AdjustStockModalProp
             </VStack>
           </ModalBody>
 
-          <ModalFooter gap={3}>
-            <Button variant="ghost" onClick={handleClose}>
+          <ModalFooter gap={3} borderTop="1px solid" borderTopColor="gray.400">
+            <Button variant="ghost" color="gray.600" onClick={handleClose}>
               ביטול
             </Button>
-            <Button type="submit" colorScheme={direction === "add" ? "teal" : "red"} isLoading={mutation.isPending}>
+            <Button type="submit" colorScheme={direction === "add" ? "green" : "red"} isLoading={mutation.isPending}>
               {direction === "add" ? "הוספה" : "הפחתה"}
             </Button>
           </ModalFooter>

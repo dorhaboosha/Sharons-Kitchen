@@ -74,28 +74,29 @@ export function EditDishModal({ dish, isOpen, onClose }: EditDishModalProps) {
   return (
     <Modal isOpen={isOpen} onClose={handleClose} closeOnOverlayClick={false}>
       <ModalOverlay />
-      <ModalContent dir="rtl">
-        <ModalHeader>עריכת מנה</ModalHeader>
-        <ModalCloseButton />
+      <ModalContent dir="rtl" bg="brand.50" color="gray.800" borderRadius="xl" overflow="hidden">
+        <ModalHeader bg="brand.200" color="#2C1810" textAlign="center" fontSize="xl" fontWeight="bold"
+          borderBottom="2px solid" borderBottomColor="gray.400">
+          עריכת מנה ✏️
+        </ModalHeader>
+        <ModalCloseButton color="#2C1810" />
 
         <form onSubmit={handleSubmit(onSubmit)}>
-          <ModalBody>
+          <ModalBody pt={5}>
             <VStack spacing={4} align="stretch">
               <DishFormFields register={register as unknown as UseFormRegister<CreateDishData>} errors={errors as FieldErrors<CreateDishData>} />
 
               <FormControl display="flex" alignItems="center" gap={3}>
-                <FormLabel mb={0}>מנה פעילה</FormLabel>
-                <Switch
-                  isChecked={isActive ?? true}
-                  onChange={(e) => setValue("isActive", e.target.checked)}
-                  colorScheme="brand"
-                />
+                <FormLabel mb={0} color="gray.700">מנה פעילה</FormLabel>
+                <Switch isChecked={isActive ?? true} onChange={(e) => setValue("isActive", e.target.checked)}
+                  sx={{".chakra-switch__track[data-checked]": { bg: "green.400" },
+                  ".chakra-switch__track:not([data-checked])": { bg: "red.400" } }} />
               </FormControl>
             </VStack>
           </ModalBody>
 
-          <ModalFooter gap={3}>
-            <Button variant="ghost" onClick={handleClose}>
+          <ModalFooter gap={3} borderTop="1px solid" borderTopColor="gray.400">
+            <Button variant="ghost" color="gray.700" onClick={handleClose}>
               ביטול
             </Button>
             <Button type="submit" colorScheme="brand" isLoading={mutation.isPending}>
