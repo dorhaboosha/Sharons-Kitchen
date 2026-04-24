@@ -8,6 +8,7 @@ import { CreateDishModal } from "../features/inventory/components/CreateDishModa
 import { EditDishModal } from "../features/inventory/components/EditDishModal";
 import { DeleteConfirmDialog } from "../features/inventory/components/DeleteConfirmDialog";
 import { AdjustStockModal } from "../features/inventory/components/AdjustStockModal";
+import { StockLegend } from "../features/inventory/components/StockLegend";
 import { RestoreConfirmDialog } from "../features/inventory/components/RestoreConfirmDialog";
 import { SortValue } from "../features/inventory/components/SortControls";
 
@@ -93,6 +94,8 @@ export function InventoryPage() {
       <InventoryToolbar search={search} onSearchChange={setSearch} filter={filter} onFilterChange={setFilter}
         sort={sort} onSortChange={setSort}
         onAddClick={createModal.onOpen} />
+
+      <StockLegend />
 
       <InventoryTable dishes={dishes} isLoading={isLoading} hasActiveFilters={hasActiveFilters} onEdit={handleEdit} onDelete={handleDelete} onRestore={handleRestore} onAdjustStock={handleAdjustStock} onClearFilters={handleClearFilters} />
 
