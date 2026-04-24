@@ -125,21 +125,24 @@ export function InventoryTable({ dishes, isLoading = false, hasActiveFilters = f
                 </Td>
                 <Td textAlign="center">
                   <HStack spacing={2} justify="center">
-                    {/* Edit — blue border + text */}
-                    <Button {...BTN_BASE} color="brand.700" borderColor="brand.400" onClick={() => onEdit(dish)}>
-                      עריכה
-                    </Button>
-                    {/* Adjust stock — brown border + text */}
-                    <Button {...BTN_BASE} color="#5C3317" borderColor="#8B5A3A" onClick={() => onAdjustStock(dish)}>
-                      מלאי
-                    </Button>
-                    {dish.isActive ? (
-                      /* Delete — red border + text */
-                      <Button {...BTN_BASE} color="red.600" borderColor="red.400" onClick={() => onDelete(dish.id)}>
-                        מחיקה
-                      </Button>
-                    ) : (
-                      /* Restore — green border + text */
+                    {dish.isActive && (
+                      <>
+                        {/* Edit — blue border + text (active only) */}
+                        <Button {...BTN_BASE} color="brand.700" borderColor="brand.400" onClick={() => onEdit(dish)}>
+                          עריכה
+                        </Button>
+                        {/* Adjust stock — brown border + text (active only) */}
+                        <Button {...BTN_BASE} color="#5C3317" borderColor="#8B5A3A" onClick={() => onAdjustStock(dish)}>
+                          עדכון כמות
+                        </Button>
+                        {/* Delete — red border + text (active only) */}
+                        <Button {...BTN_BASE} color="red.600" borderColor="red.400" onClick={() => onDelete(dish.id)}>
+                          מחיקה
+                        </Button>
+                      </>
+                    )}
+                    {!dish.isActive && (
+                      /* Restore — green border + text (inactive only) */
                       <Button {...BTN_BASE} color="green.700" borderColor="green.500" onClick={() => onRestore(dish)}>
                         שחזור
                       </Button>
