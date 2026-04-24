@@ -8,6 +8,7 @@ import { CreateDishModal } from "../features/inventory/components/CreateDishModa
 import { EditDishModal } from "../features/inventory/components/EditDishModal";
 import { DeleteConfirmDialog } from "../features/inventory/components/DeleteConfirmDialog";
 import { AdjustStockModal } from "../features/inventory/components/AdjustStockModal";
+import { RestoreConfirmDialog } from "../features/inventory/components/RestoreConfirmDialog";
 import { SortValue } from "../features/inventory/components/SortControls";
 
 export function InventoryPage() {
@@ -33,10 +34,12 @@ export function InventoryPage() {
   const createModal = useDisclosure();
   const editModal = useDisclosure();
   const deleteDialog = useDisclosure();
+  const restoreDialog = useDisclosure();
   const adjustStockModal = useDisclosure();
 
   const [editingDish, setEditingDish] = useState<Dish | null>(null);
   const [deletingDish, setDeletingDish] = useState<{ id: DishId; name: string } | null>(null);
+  const [restoringDish, setRestoringDish] = useState<{ id: DishId; name: string } | null>(null);
   const [adjustingDish, setAdjustingDish] = useState<Dish | null>(null);
 
   function handleEdit(dish: Dish) {
@@ -61,6 +64,16 @@ export function InventoryPage() {
     setDeletingDish(null);
   }
 
+  function handleRestore(dish: Dish) {
+    setRestoringDish({ id: dish.id, name: dish.name });
+    restoreDialog.onOpen();
+  }
+
+  function handleRestoreClose() {
+    restoreDialog.onClose();
+    setRestoringDish(null);
+  }
+
   function handleAdjustStock(dish: Dish) {
     setAdjustingDish(dish);
     adjustStockModal.onOpen();
@@ -81,13 +94,15 @@ export function InventoryPage() {
         sort={sort} onSortChange={setSort}
         onAddClick={createModal.onOpen} />
 
-      <InventoryTable dishes={dishes} isLoading={isLoading} hasActiveFilters={hasActiveFilters} onEdit={handleEdit} onDelete={handleDelete} onRestore={handleEdit} onAdjustStock={handleAdjustStock} onClearFilters={handleClearFilters} />
+      <InventoryTable dishes={dishes} isLoading={isLoading} hasActiveFilters={hasActiveFilters} onEdit={handleEdit} onDelete={handleDelete} onRestore={handleRestore} onAdjustStock={handleAdjustStock} onClearFilters={handleClearFilters} />
 
       <CreateDishModal isOpen={createModal.isOpen} onClose={createModal.onClose} />
 
       <EditDishModal dish={editingDish} isOpen={editModal.isOpen} onClose={handleEditClose} />
 
       <DeleteConfirmDialog dishId={deletingDish?.id ?? null} dishName={deletingDish?.name ?? ""} isOpen={deleteDialog.isOpen} onClose={handleDeleteClose} />
+
+      <RestoreConfirmDialog dishId={restoringDish?.id ?? null} dishName={restoringDish?.name ?? ""} isOpen={restoreDialog.isOpen} onClose={handleRestoreClose} />
 
       <AdjustStockModal dish={adjustingDish} isOpen={adjustStockModal.isOpen} onClose={handleAdjustStockClose} />
     </Box>
