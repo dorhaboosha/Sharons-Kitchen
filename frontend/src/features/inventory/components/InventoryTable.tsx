@@ -49,11 +49,11 @@ function EmptyState({ hasActiveFilters, onClearFilters }: { hasActiveFilters: bo
             <Text fontWeight="semibold" fontSize="lg" color="blackAlpha.800">
               לא נמצאו תוצאות
             </Text>
-            <Text fontSize="sm" color="blackAlpha.700">
+            <Text fontSize="md" color="blackAlpha.900">
               אין מנות התואמות את החיפוש או הסינון הנוכחי.
             </Text>
             {onClearFilters && (
-              <Button size="sm" variant="outline" onClick={onClearFilters}>
+              <Button size="md" colorScheme="brand" variant="solid" onClick={onClearFilters}>
                 נקה סינון
               </Button>
             )}
@@ -71,7 +71,7 @@ function EmptyState({ hasActiveFilters, onClearFilters }: { hasActiveFilters: bo
           <Text fontWeight="semibold" fontSize="lg" color="blackAlpha.800">
             המלאי ריק
           </Text>
-          <Text fontSize="sm" color="blackAlpha.700">
+          <Text fontSize="md" color="blackAlpha.900">
             לא נוספו מנות עדיין. לחץ על &quot;הוספת מנה&quot; כדי להתחיל.
           </Text>
         </VStack>
