@@ -16,6 +16,8 @@ const INPUT_STYLES = {
   _focusVisible: { borderColor: "gray.700", boxShadow: "none" },
 };
 
+const LABEL_STYLES = { color: "gray.700", mb: 1 };
+
 const STEPPER_STYLES = {
   border: "none" as const,
   color: "gray.600",
@@ -26,13 +28,13 @@ export function DishFormFields({ register, errors }: DishFormFieldsProps) {
   return (
     <>
       <FormControl isInvalid={!!errors.name} isRequired>
-        <FormLabel color="gray.700">שם מנה</FormLabel>
+        <FormLabel {...LABEL_STYLES}>שם מנה</FormLabel>
         <Input {...register("name")} placeholder="לדוגמה: קציצות ברוטב" {...INPUT_STYLES} />
         <FormErrorMessage>{errors.name?.message}</FormErrorMessage>
       </FormControl>
 
       <FormControl isInvalid={!!errors.price} isRequired>
-        <FormLabel color="gray.700">מחיר (₪)</FormLabel>
+        <FormLabel {...LABEL_STYLES}>מחיר (₪)</FormLabel>
         <NumberInput min={0} precision={0} dir="ltr">
           <NumberInputField {...register("price", { valueAsNumber: true })} placeholder="0" textAlign="right" {...INPUT_STYLES} />
           <NumberInputStepper border="none">
@@ -44,7 +46,7 @@ export function DishFormFields({ register, errors }: DishFormFieldsProps) {
       </FormControl>
 
       <FormControl isInvalid={!!errors.quantity} isRequired>
-        <FormLabel color="gray.700">כמות (קופסאות)</FormLabel>
+        <FormLabel {...LABEL_STYLES}>כמות (קופסאות)</FormLabel>
         <NumberInput min={0} precision={0} dir="ltr">
           <NumberInputField {...register("quantity", { valueAsNumber: true })} placeholder="0" textAlign="right" {...INPUT_STYLES} />
           <NumberInputStepper border="none">
@@ -56,7 +58,7 @@ export function DishFormFields({ register, errors }: DishFormFieldsProps) {
       </FormControl>
 
       <FormControl isInvalid={!!errors.unitsPerBox}>
-        <FormLabel color="gray.700">יחידות בקופסה</FormLabel>
+        <FormLabel {...LABEL_STYLES}>יחידות בקופסה</FormLabel>
         <NumberInput min={1} precision={0} dir="ltr">
           <NumberInputField {...register("unitsPerBox", { valueAsNumber: true })} placeholder="לדוגמה: 6" textAlign="right" {...INPUT_STYLES} />
           <NumberInputStepper border="none">
@@ -68,7 +70,7 @@ export function DishFormFields({ register, errors }: DishFormFieldsProps) {
       </FormControl>
 
       <FormControl isInvalid={!!errors.description}>
-        <FormLabel color="gray.700">תיאור</FormLabel>
+        <FormLabel {...LABEL_STYLES}>תיאור</FormLabel>
         <Input {...register("description")} placeholder="לדוגמה: קציצות ברוטב עגבניות" {...INPUT_STYLES} />
         <FormErrorMessage>{errors.description?.message}</FormErrorMessage>
       </FormControl>

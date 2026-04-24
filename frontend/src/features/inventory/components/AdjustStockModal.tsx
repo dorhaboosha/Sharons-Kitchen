@@ -76,7 +76,7 @@ export function AdjustStockModal({ dish, isOpen, onClose }: AdjustStockModalProp
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} closeOnOverlayClick={false} size={{ base: "md", md: "lg" }}>
+    <Modal isOpen={isOpen} onClose={handleClose} closeOnOverlayClick={true} size={{ base: "md", md: "lg" }}>
       <ModalOverlay />
       <ModalContent dir="rtl" bg="brand.50" color="gray.800" borderRadius="xl" overflow="hidden">
         <ModalHeader bg="brand.200" color="#2C1810" textAlign="center" fontSize="xl" fontWeight="bold"

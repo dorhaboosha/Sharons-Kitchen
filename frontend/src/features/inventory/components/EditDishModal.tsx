@@ -72,7 +72,7 @@ export function EditDishModal({ dish, isOpen, onClose }: EditDishModalProps) {
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} closeOnOverlayClick={false} size={{ base: "md", md: "lg" }}>
+    <Modal isOpen={isOpen} onClose={handleClose} closeOnOverlayClick={true} size={{ base: "md", md: "lg" }}>
       <ModalOverlay />
       <ModalContent dir="rtl" bg="brand.50" color="gray.800" borderRadius="xl" overflow="hidden">
         <ModalHeader bg="brand.200" color="#2C1810" textAlign="center" fontSize="xl" fontWeight="bold"
@@ -82,8 +82,8 @@ export function EditDishModal({ dish, isOpen, onClose }: EditDishModalProps) {
         <ModalCloseButton color="#2C1810" />
 
         <form onSubmit={handleSubmit(onSubmit)}>
-          <ModalBody pt={5}>
-            <VStack spacing={4} align="stretch">
+          <ModalBody pt={3} pb={2}>
+            <VStack spacing={3} align="stretch">
               <DishFormFields register={register as unknown as UseFormRegister<CreateDishData>} errors={errors as FieldErrors<CreateDishData>} />
 
               <FormControl display="flex" alignItems="center" gap={3}>

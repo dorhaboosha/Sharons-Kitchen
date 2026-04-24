@@ -53,7 +53,7 @@ export function CreateDishModal({ isOpen, onClose }: CreateDishModalProps) {
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} closeOnOverlayClick={false} size={{ base: "md", md: "lg" }}>
+    <Modal isOpen={isOpen} onClose={handleClose} closeOnOverlayClick={true} size={{ base: "md", md: "lg" }}>
       <ModalOverlay />
       <ModalContent dir="rtl" bg="brand.50" color="gray.800" borderRadius="xl" overflow="hidden">
         {/* Header strip in logo blue with brown title text */}
@@ -64,8 +64,8 @@ export function CreateDishModal({ isOpen, onClose }: CreateDishModalProps) {
         <ModalCloseButton color="#2C1810" />
 
         <form onSubmit={handleSubmit(onSubmit)}>
-          <ModalBody pt={5}>
-            <VStack spacing={4} align="stretch">
+          <ModalBody pt={3} pb={2}>
+            <VStack spacing={3} align="stretch">
               <DishFormFields register={register} errors={errors} />
             </VStack>
           </ModalBody>

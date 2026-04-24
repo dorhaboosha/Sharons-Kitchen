@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import { AlertDialog, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader,
-  AlertDialogBody, AlertDialogFooter, Button, useToast } from "@chakra-ui/react";
+  AlertDialogBody, AlertDialogFooter, AlertDialogCloseButton, Button, useToast } from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { DishId } from "@sharons-kitchen/shared";
 import { updateDish } from "../services/inventoryService";
@@ -37,7 +37,7 @@ export function RestoreConfirmDialog({ dishId, dishName, isOpen, onClose }: Rest
   });
 
   return (
-    <AlertDialog isOpen={isOpen} leastDestructiveRef={cancelRef} onClose={onClose} size={{ base: "sm", md: "md" }}>
+    <AlertDialog isOpen={isOpen} leastDestructiveRef={cancelRef} onClose={onClose} size={{ base: "sm", md: "md" }} closeOnOverlayClick>
       <AlertDialogOverlay>
         <AlertDialogContent dir="rtl" bg="brand.50" color="gray.800"
           borderRadius="xl" overflow="hidden">
@@ -45,6 +45,7 @@ export function RestoreConfirmDialog({ dishId, dishName, isOpen, onClose }: Rest
             fontWeight="bold" borderBottom="2px solid" borderBottomColor="gray.400">
             שחזור מנה ♻️
           </AlertDialogHeader>
+          <AlertDialogCloseButton color="#2C1810" />
 
           <AlertDialogBody pt={5}>
             האם לשחזר את המנה <strong>{dishName}</strong>?
