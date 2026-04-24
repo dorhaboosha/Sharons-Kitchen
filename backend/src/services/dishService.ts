@@ -73,6 +73,11 @@ export async function updateDish(id: number, input: UpdateDishInput) {
     throw new AppError("NOT_FOUND", 404, "המנה לא נמצאה");
   }
 
+  // Inactive dishes can only be restored — all other edits are blocked
+  if (!dish.isActive && input.isActive !== true) {
+    throw new AppError("VALIDATION_ERROR", 400, "לא ניתן לערוך מנה לא פעילה");
+  }
+
   const data: Prisma.DishUpdateInput = { ...input };
 
   if (input.name !== undefined) {
@@ -91,6 +96,10 @@ export async function adjustStock(id: number, delta: number) {
   const dish = await prisma.dish.findUnique({ where: { id } });
   if (!dish) {
     throw new AppError("NOT_FOUND", 404, "המנה לא נמצאה");
+  }
+
+  if (!dish.isActive) {
+    throw new AppError("VALIDATION_ERROR", 400, "לא ניתן לעדכן מלאי של מנה לא פעילה");
   }
 
   const newQuantity = dish.quantity + delta;
