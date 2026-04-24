@@ -46,10 +46,10 @@ function EmptyState({ hasActiveFilters, onClearFilters }: { hasActiveFilters: bo
         <Td colSpan={COLUMNS.length} py={16}>
           <VStack spacing={3} align="center">
             <Box fontSize="4xl" lineHeight={1}>🔍</Box>
-            <Text fontWeight="semibold" fontSize="lg" color="gray.600">
+            <Text fontWeight="semibold" fontSize="lg" color="blackAlpha.800">
               לא נמצאו תוצאות
             </Text>
-            <Text fontSize="sm" color="gray.400">
+            <Text fontSize="sm" color="blackAlpha.600">
               אין מנות התואמות את החיפוש או הסינון הנוכחי.
             </Text>
             {onClearFilters && (
@@ -68,10 +68,10 @@ function EmptyState({ hasActiveFilters, onClearFilters }: { hasActiveFilters: bo
       <Td colSpan={COLUMNS.length} py={16}>
         <VStack spacing={3} align="center">
           <Box fontSize="4xl" lineHeight={1}>🍽️</Box>
-          <Text fontWeight="semibold" fontSize="lg" color="gray.600">
+          <Text fontWeight="semibold" fontSize="lg" color="blackAlpha.800">
             המלאי ריק
           </Text>
-          <Text fontSize="sm" color="gray.400">
+          <Text fontSize="sm" color="blackAlpha.600">
             לא נוספו מנות עדיין. לחץ על &quot;הוספת מנה&quot; כדי להתחיל.
           </Text>
         </VStack>
