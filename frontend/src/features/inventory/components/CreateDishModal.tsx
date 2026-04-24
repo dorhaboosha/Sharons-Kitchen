@@ -19,7 +19,7 @@ export function CreateDishModal({ isOpen, onClose }: CreateDishModalProps) {
   const toast = useToast();
 
   const { register, handleSubmit, reset, setError, control, formState: { errors } } =
-    useForm<CreateDishData>({ resolver: zodResolver(CreateDishSchema), defaultValues: { quantity: 1 } });
+    useForm<CreateDishData>({ resolver: zodResolver(CreateDishSchema), defaultValues: { price: 1, quantity: 1 } });
 
   const mutation = useMutation({
     mutationFn: createDish,

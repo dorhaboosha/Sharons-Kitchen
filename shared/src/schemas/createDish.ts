@@ -5,7 +5,7 @@ export const CreateDishSchema = z.object({
   price: z
     .number({ invalid_type_error: "המחיר חייב להיות מספר" })
     .int("המחיר חייב להיות מספר שלם")
-    .min(0, "המחיר לא יכול להיות שלילי"),
+    .min(1, "המחיר חייב להיות לפחות 1"),
   quantity: z
     .number({ invalid_type_error: "הכמות חייבת להיות מספר" })
     .int("הכמות חייבת להיות מספר שלם")

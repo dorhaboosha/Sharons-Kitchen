@@ -35,20 +35,31 @@ export function DishFormFields({ register, errors, control }: DishFormFieldsProp
         <FormErrorMessage>{errors.name?.message}</FormErrorMessage>
       </FormControl>
 
+      {/* Price — controlled so Chakra NumberInput shows/resets the RHF value correctly */}
       <FormControl isInvalid={!!errors.price} isRequired>
         <FormLabel {...LABEL_STYLES}>מחיר (₪)</FormLabel>
-        <NumberInput min={0} precision={0} dir="ltr">
-          <NumberInputField {...register("price", { valueAsNumber: true })} placeholder="0" textAlign="right" {...INPUT_STYLES} />
-          <NumberInputStepper border="none">
-            <NumberIncrementStepper {...STEPPER_STYLES} />
-            <NumberDecrementStepper {...STEPPER_STYLES} />
-          </NumberInputStepper>
-        </NumberInput>
+        <Controller name="price" control={control} defaultValue={1} render={({ field }) => (
+            <NumberInput min={1} precision={0} dir="ltr" value={isNaN(field.value) ? "" : field.value}
+              onChange={(_, valueAsNumber) => field.onChange(isNaN(valueAsNumber) ? "" : valueAsNumber)}
+              onBlur={() => {
+                if (field.value === undefined || field.value === null || (field.value as unknown as string) === "" || isNaN(field.value) || field.value < 1) {
+                  field.onChange(1);
+                }
+                field.onBlur();
+              }}
+            >
+              <NumberInputField textAlign="right" {...INPUT_STYLES} />
+              <NumberInputStepper border="none">
+                <NumberIncrementStepper {...STEPPER_STYLES} />
+                <NumberDecrementStepper {...STEPPER_STYLES} />
+              </NumberInputStepper>
+            </NumberInput>
+          )}
+        />
         <FormErrorMessage>{errors.price?.message}</FormErrorMessage>
       </FormControl>
 
-      {/* Quantity uses Controller so Chakra's NumberInput properly reflects the RHF value,
-          and the blur handler resets to 1 when the field is left empty */}
+      {/* Quantity — controlled; defaults to 1 and snaps back to 1 on blur if cleared */}
       <FormControl isInvalid={!!errors.quantity} isRequired>
         <FormLabel {...LABEL_STYLES}>כמות (קופסאות)</FormLabel>
         <Controller
@@ -80,15 +91,27 @@ export function DishFormFields({ register, errors, control }: DishFormFieldsProp
         <FormErrorMessage>{errors.quantity?.message}</FormErrorMessage>
       </FormControl>
 
+      {/* Units per box — optional; if a value is entered it must be ≥ 1 (corrected on blur) */}
       <FormControl isInvalid={!!errors.unitsPerBox}>
         <FormLabel {...LABEL_STYLES}>יחידות בקופסה</FormLabel>
-        <NumberInput min={1} precision={0} dir="ltr">
-          <NumberInputField {...register("unitsPerBox", { valueAsNumber: true })} placeholder="לדוגמה: 6" textAlign="right" {...INPUT_STYLES} />
-          <NumberInputStepper border="none">
-            <NumberIncrementStepper {...STEPPER_STYLES} />
-            <NumberDecrementStepper {...STEPPER_STYLES} />
-          </NumberInputStepper>
-        </NumberInput>
+        <Controller name="unitsPerBox" control={control} render={({ field }) => (
+            <NumberInput min={1} precision={0} dir="ltr" value={field.value ?? ""}
+              onChange={(_, valueAsNumber) => field.onChange(isNaN(valueAsNumber) ? undefined : valueAsNumber)}
+              onBlur={() => {
+                if (field.value !== undefined && !isNaN(field.value) && field.value < 1) {
+                  field.onChange(1);
+                }
+                field.onBlur();
+              }}
+            >
+              <NumberInputField textAlign="right" placeholder="לדוגמה: 6" {...INPUT_STYLES} />
+              <NumberInputStepper border="none">
+                <NumberIncrementStepper {...STEPPER_STYLES} />
+                <NumberDecrementStepper {...STEPPER_STYLES} />
+              </NumberInputStepper>
+            </NumberInput>
+          )}
+        />
         <FormErrorMessage>{errors.unitsPerBox?.message}</FormErrorMessage>
       </FormControl>
 
