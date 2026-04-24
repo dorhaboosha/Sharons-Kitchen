@@ -72,7 +72,7 @@ export function EditDishModal({ dish, isOpen, onClose }: EditDishModalProps) {
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} closeOnOverlayClick={false}>
+    <Modal isOpen={isOpen} onClose={handleClose} closeOnOverlayClick={false} size={{ base: "md", md: "lg" }}>
       <ModalOverlay />
       <ModalContent dir="rtl" bg="brand.50" color="gray.800" borderRadius="xl" overflow="hidden">
         <ModalHeader bg="brand.200" color="#2C1810" textAlign="center" fontSize="xl" fontWeight="bold"

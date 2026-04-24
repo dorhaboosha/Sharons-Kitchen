@@ -30,6 +30,15 @@ const BTN_BASE = {
   _hover: { bg: "whiteAlpha.900" },
 };
 
+const COLUMNS = [
+  { key: "name", label: "שם מנה" },
+  { key: "price", label: "מחיר (₪)" },
+  { key: "quantity", label: "כמות" },
+  { key: "unitsPerBox", label: "יחידות בקופסה" },
+  { key: "description", label: "תיאור" },
+  { key: "actions", label: "פעולות" },
+] as const;
+
 function EmptyState({ hasActiveFilters, onClearFilters }: { hasActiveFilters: boolean; onClearFilters?: () => void }) {
   if (hasActiveFilters) {
     return (
@@ -71,18 +80,9 @@ function EmptyState({ hasActiveFilters, onClearFilters }: { hasActiveFilters: bo
   );
 }
 
-const COLUMNS = [
-  { key: "name", label: "שם מנה" },
-  { key: "price", label: "מחיר (₪)" },
-  { key: "quantity", label: "כמות" },
-  { key: "unitsPerBox", label: "יחידות בקופסה" },
-  { key: "description", label: "תיאור" },
-  { key: "actions", label: "פעולות" },
-] as const;
-
 export function InventoryTable({ dishes, isLoading = false, hasActiveFilters = false, onEdit, onDelete, onRestore, onAdjustStock, onClearFilters }: InventoryTableProps) {
   return (
-    <TableContainer borderWidth={2} borderRadius="md" borderColor="gray.500">
+    <TableContainer borderWidth={2} borderRadius="md" borderColor="gray.500" overflowX="auto">
       <Table
         variant="simple"
         size="md"
@@ -127,22 +127,18 @@ export function InventoryTable({ dishes, isLoading = false, hasActiveFilters = f
                   <HStack spacing={2} justify="center">
                     {dish.isActive && (
                       <>
-                        {/* Edit — blue border + text (active only) */}
                         <Button {...BTN_BASE} color="brand.700" borderColor="brand.400" onClick={() => onEdit(dish)}>
                           עריכה
                         </Button>
-                        {/* Adjust stock — brown border + text (active only) */}
                         <Button {...BTN_BASE} color="#5C3317" borderColor="#8B5A3A" onClick={() => onAdjustStock(dish)}>
                           עדכון כמות
                         </Button>
-                        {/* Delete — red border + text (active only) */}
                         <Button {...BTN_BASE} color="red.600" borderColor="red.400" onClick={() => onDelete(dish.id)}>
                           מחיקה
                         </Button>
                       </>
                     )}
                     {!dish.isActive && (
-                      /* Restore — green border + text (inactive only) */
                       <Button {...BTN_BASE} color="green.700" borderColor="green.500" onClick={() => onRestore(dish)}>
                         שחזור
                       </Button>

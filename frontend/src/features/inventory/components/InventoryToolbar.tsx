@@ -19,20 +19,20 @@ export function InventoryToolbar({ search, onSearchChange, filter, onFilterChang
     <Flex mb={4} gap={3} wrap="wrap" align="center" justify="space-between">
       {/* Right group: search + filter + sort */}
       <Flex gap={3} wrap="wrap" align="center" flex={1}>
-        <Box flex={1} minW="200px">
+        <Box w={{ base: "100%", md: "auto" }} flex={{ base: "none", md: 1 }} minW={{ md: "200px" }}>
           <SearchBar value={search} onChange={onSearchChange} />
         </Box>
 
-        <Box>
+        <Box w={{ base: "100%", md: "auto" }}>
           <FilterButtons value={filter} onChange={onFilterChange} />
         </Box>
 
-        <Box>
+        <Box w={{ base: "100%", md: "auto" }}>
           <SortControls sort={sort} onSortChange={onSortChange} />
         </Box>
       </Flex>
 
-      <Button colorScheme="brand" flexShrink={0} onClick={onAddClick}>
+      <Button colorScheme="brand" flexShrink={0} w={{ base: "100%", md: "auto" }} onClick={onAddClick}>
         הוספת מנה
       </Button>
     </Flex>

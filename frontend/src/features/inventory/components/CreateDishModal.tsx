@@ -53,7 +53,7 @@ export function CreateDishModal({ isOpen, onClose }: CreateDishModalProps) {
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} closeOnOverlayClick={false}>
+    <Modal isOpen={isOpen} onClose={handleClose} closeOnOverlayClick={false} size={{ base: "md", md: "lg" }}>
       <ModalOverlay />
       <ModalContent dir="rtl" bg="brand.50" color="gray.800" borderRadius="xl" overflow="hidden">
         {/* Header strip in logo blue with brown title text */}

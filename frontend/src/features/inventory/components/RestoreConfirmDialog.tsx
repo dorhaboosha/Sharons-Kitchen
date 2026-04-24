@@ -37,7 +37,7 @@ export function RestoreConfirmDialog({ dishId, dishName, isOpen, onClose }: Rest
   });
 
   return (
-    <AlertDialog isOpen={isOpen} leastDestructiveRef={cancelRef} onClose={onClose}>
+    <AlertDialog isOpen={isOpen} leastDestructiveRef={cancelRef} onClose={onClose} size={{ base: "sm", md: "md" }}>
       <AlertDialogOverlay>
         <AlertDialogContent dir="rtl" bg="brand.50" color="gray.800"
           borderRadius="xl" overflow="hidden">

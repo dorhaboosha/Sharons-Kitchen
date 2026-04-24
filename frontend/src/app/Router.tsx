@@ -8,8 +8,10 @@ const BG_OVERLAY = `linear-gradient(rgba(255,255,255,0.35), rgba(255,255,255,0.3
 export function Router() {
   return (
     <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-      <Box minH="100vh" bgImage={BG_OVERLAY} bgRepeat="no-repeat" bgSize="cover"
-        bgPosition="center" bgAttachment="fixed">
+      <Box minH="100vh" bgImage={BG_OVERLAY} bgRepeat="no-repeat"
+        bgSize={{ base: "100% 100%", md: "cover" }}
+        bgPosition="center"
+        bgAttachment={{ base: "scroll", md: "fixed" }}>
         <Routes>
           <Route path="/" element={<InventoryPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />

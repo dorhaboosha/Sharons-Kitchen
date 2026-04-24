@@ -36,11 +36,7 @@ export function DeleteConfirmDialog({ dishId, dishName, isOpen, onClose }: Delet
   });
 
   return (
-    <AlertDialog
-      isOpen={isOpen}
-      leastDestructiveRef={cancelRef}
-      onClose={onClose}
-    >
+    <AlertDialog isOpen={isOpen} leastDestructiveRef={cancelRef} onClose={onClose} size={{ base: "sm", md: "md" }}>
       <AlertDialogOverlay>
         <AlertDialogContent dir="rtl" bg="brand.50" color="gray.800" borderRadius="xl" overflow="hidden">
           <AlertDialogHeader bg="brand.200" color="#2C1810" textAlign="center" fontSize="lg" fontWeight="bold"
