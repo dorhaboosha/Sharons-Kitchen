@@ -33,7 +33,7 @@ export const theme = extendTheme({
   styles: {
     global: {
       body: {
-        bg: 'brand.50',
+        bg: 'white',
       },
     },
   },
