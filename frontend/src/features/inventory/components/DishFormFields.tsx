@@ -1,10 +1,12 @@
-import { FormControl, FormLabel, FormErrorMessage, Input, NumberInput, NumberInputField, NumberInputStepper, NumberIncrementStepper, NumberDecrementStepper } from "@chakra-ui/react";
-import { UseFormRegister, FieldErrors } from "react-hook-form";
+import { FormControl, FormLabel, FormErrorMessage, Input, NumberInput, NumberInputField,
+  NumberInputStepper, NumberIncrementStepper, NumberDecrementStepper } from "@chakra-ui/react";
+import { UseFormRegister, FieldErrors, Controller, Control } from "react-hook-form";
 import { CreateDishData } from "@sharons-kitchen/shared";
 
 interface DishFormFieldsProps {
   register: UseFormRegister<CreateDishData>;
   errors: FieldErrors<CreateDishData>;
+  control: Control<CreateDishData>;
 }
 
 const INPUT_STYLES = {
@@ -24,7 +26,7 @@ const STEPPER_STYLES = {
   _hover: { bg: "transparent" },
 };
 
-export function DishFormFields({ register, errors }: DishFormFieldsProps) {
+export function DishFormFields({ register, errors, control }: DishFormFieldsProps) {
   return (
     <>
       <FormControl isInvalid={!!errors.name} isRequired>
@@ -45,15 +47,36 @@ export function DishFormFields({ register, errors }: DishFormFieldsProps) {
         <FormErrorMessage>{errors.price?.message}</FormErrorMessage>
       </FormControl>
 
+      {/* Quantity uses Controller so Chakra's NumberInput properly reflects the RHF value,
+          and the blur handler resets to 1 when the field is left empty */}
       <FormControl isInvalid={!!errors.quantity} isRequired>
-        <FormLabel {...LABEL_STYLES}>כמות (קופסאות) — לפחות 1</FormLabel>
-        <NumberInput min={1} precision={0} dir="ltr">
-          <NumberInputField {...register("quantity", { valueAsNumber: true })} placeholder="1" textAlign="right" {...INPUT_STYLES} />
-          <NumberInputStepper border="none">
-            <NumberIncrementStepper {...STEPPER_STYLES} />
-            <NumberDecrementStepper {...STEPPER_STYLES} />
-          </NumberInputStepper>
-        </NumberInput>
+        <FormLabel {...LABEL_STYLES}>כמות (קופסאות)</FormLabel>
+        <Controller
+          name="quantity"
+          control={control}
+          defaultValue={1}
+          render={({ field }) => (
+            <NumberInput
+              min={1}
+              precision={0}
+              dir="ltr"
+              value={isNaN(field.value) ? "" : field.value}
+              onChange={(_, valueAsNumber) => field.onChange(isNaN(valueAsNumber) ? "" : valueAsNumber)}
+              onBlur={() => {
+                if (!field.value || isNaN(field.value) || field.value < 1) {
+                  field.onChange(1);
+                }
+                field.onBlur();
+              }}
+            >
+              <NumberInputField textAlign="right" {...INPUT_STYLES} />
+              <NumberInputStepper border="none">
+                <NumberIncrementStepper {...STEPPER_STYLES} />
+                <NumberDecrementStepper {...STEPPER_STYLES} />
+              </NumberInputStepper>
+            </NumberInput>
+          )}
+        />
         <FormErrorMessage>{errors.quantity?.message}</FormErrorMessage>
       </FormControl>
 

@@ -18,8 +18,8 @@ export function CreateDishModal({ isOpen, onClose }: CreateDishModalProps) {
   const queryClient = useQueryClient();
   const toast = useToast();
 
-  const { register, handleSubmit, reset, setError, formState: { errors } } =
-    useForm<CreateDishData>({ resolver: zodResolver(CreateDishSchema) });
+  const { register, handleSubmit, reset, setError, control, formState: { errors } } =
+    useForm<CreateDishData>({ resolver: zodResolver(CreateDishSchema), defaultValues: { quantity: 1 } });
 
   const mutation = useMutation({
     mutationFn: createDish,
@@ -66,7 +66,7 @@ export function CreateDishModal({ isOpen, onClose }: CreateDishModalProps) {
         <form onSubmit={handleSubmit(onSubmit)}>
           <ModalBody pt={3} pb={2}>
             <VStack spacing={3} align="stretch">
-              <DishFormFields register={register} errors={errors} />
+              <DishFormFields register={register} errors={errors} control={control} />
             </VStack>
           </ModalBody>
 

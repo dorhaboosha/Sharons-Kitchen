@@ -9,7 +9,7 @@ import { DishFormFields } from "./DishFormFields";
 import { updateDish } from "../services/inventoryService";
 import { DISHES_QUERY_KEY } from "../hooks/useInventory";
 import { ApiClientError } from "../../../services/apiClient";
-import type { UseFormRegister, FieldErrors } from "react-hook-form";
+import type { UseFormRegister, FieldErrors, Control } from "react-hook-form";
 
 interface EditDishModalProps {
   dish: Dish | null;
@@ -21,7 +21,7 @@ export function EditDishModal({ dish, isOpen, onClose }: EditDishModalProps) {
   const queryClient = useQueryClient();
   const toast = useToast();
 
-  const { register, handleSubmit, reset, watch, setValue, setError, formState: { errors } } =
+  const { register, handleSubmit, reset, watch, setValue, setError, control, formState: { errors } } =
     useForm<UpdateDishData>({ resolver: zodResolver(UpdateDishSchema) });
 
   const isActive = watch("isActive");
@@ -84,7 +84,7 @@ export function EditDishModal({ dish, isOpen, onClose }: EditDishModalProps) {
         <form onSubmit={handleSubmit(onSubmit)}>
           <ModalBody pt={3} pb={2}>
             <VStack spacing={3} align="stretch">
-              <DishFormFields register={register as unknown as UseFormRegister<CreateDishData>} errors={errors as FieldErrors<CreateDishData>} />
+              <DishFormFields register={register as unknown as UseFormRegister<CreateDishData>} errors={errors as FieldErrors<CreateDishData>} control={control as unknown as Control<CreateDishData>} />
 
               <FormControl display="flex" alignItems="center" gap={3}>
                 <FormLabel mb={0} color="gray.700">מנה פעילה</FormLabel>
