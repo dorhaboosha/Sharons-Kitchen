@@ -49,7 +49,7 @@ function EmptyState({ hasActiveFilters, onClearFilters }: { hasActiveFilters: bo
             <Text fontWeight="semibold" fontSize="lg" color="black">
               לא נמצאו תוצאות
             </Text>
-            <Text fontSize="lg" color="black">
+            <Text fontSize="md" color="black">
               אין מנות התואמות את החיפוש או הסינון הנוכחי.
             </Text>
             {onClearFilters && (
@@ -71,7 +71,7 @@ function EmptyState({ hasActiveFilters, onClearFilters }: { hasActiveFilters: bo
           <Text fontWeight="semibold" fontSize="lg" color="black">
             המלאי ריק
           </Text>
-          <Text fontSize="lg" color="black">
+          <Text fontSize="md" color="black">
             לא נוספו מנות עדיין. לחץ על &quot;הוספת מנה&quot; כדי להתחיל.
           </Text>
         </VStack>
@@ -82,7 +82,7 @@ function EmptyState({ hasActiveFilters, onClearFilters }: { hasActiveFilters: bo
 
 export function InventoryTable({ dishes, isLoading = false, hasActiveFilters = false, onEdit, onDelete, onRestore, onAdjustStock, onClearFilters }: InventoryTableProps) {
   return (
-    <TableContainer borderWidth={2} borderRadius="md" borderColor="gray.500" overflowX="auto">
+    <TableContainer borderWidth={2} borderRadius="md" borderColor="gray.500" overflowX="auto" bg="whiteAlpha.800">
       <Table variant="simple" size="md" dir="rtl"
         sx={{ "td, th": { borderColor: "gray.700" }, "tr:last-child td": { borderBottom: "none" } }}>
         <Thead bg="gray.100">
