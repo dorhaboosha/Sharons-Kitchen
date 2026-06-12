@@ -97,17 +97,6 @@ Every `git push` to `main` triggers an automatic redeploy of both services.
 
 ---
 
-## Documentation
-
-All docs are in `/docs`:
-- `docs/spec.md` — project specification
-- `docs/api.md` — API contract + examples
-- `docs/databaseSchema.md` — Postgres table layout
-- `docs/dataModels.md` — shared TypeScript models
-- `docs/ARCHITECTURE.md` — folder structure and conventions
-
----
-
 ## Next Steps
 
 - [ ] **Login & authentication** — protect the admin area with a login page (email + password or social login)
