@@ -12,6 +12,7 @@ interface InventoryTableProps {
   onDelete: (id: DishId) => void;
   onRestore: (dish: Dish) => void;
   onAdjustStock: (dish: Dish) => void;
+  onPermanentDelete: (dish: Dish) => void;
   onClearFilters?: () => void;
 }
 
@@ -80,7 +81,7 @@ function EmptyState({ hasActiveFilters, onClearFilters }: { hasActiveFilters: bo
   );
 }
 
-export function InventoryTable({ dishes, isLoading = false, hasActiveFilters = false, onEdit, onDelete, onRestore, onAdjustStock, onClearFilters }: InventoryTableProps) {
+export function InventoryTable({ dishes, isLoading = false, hasActiveFilters = false, onEdit, onDelete, onRestore, onAdjustStock, onPermanentDelete, onClearFilters }: InventoryTableProps) {
   return (
     <TableContainer borderWidth={2} borderRadius="md" borderColor="gray.500" overflowX="auto" bg="whiteAlpha.800">
       <Table variant="simple" size="md" dir="rtl"
@@ -135,9 +136,14 @@ export function InventoryTable({ dishes, isLoading = false, hasActiveFilters = f
                       </>
                     )}
                     {!dish.isActive && (
-                      <Button {...BTN_BASE} color="green.700" borderColor="green.500" onClick={() => onRestore(dish)}>
-                        שחזור
-                      </Button>
+                      <>
+                        <Button {...BTN_BASE} color="green.700" borderColor="green.500" onClick={() => onRestore(dish)}>
+                          שחזור
+                        </Button>
+                        <Button {...BTN_BASE} color="red.700" borderColor="red.500" onClick={() => onPermanentDelete(dish)}>
+                          מחיקה לצמיתות
+                        </Button>
+                      </>
                     )}
                   </HStack>
                 </Td>

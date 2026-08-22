@@ -10,6 +10,7 @@ import { DeleteConfirmDialog } from "../features/inventory/components/DeleteConf
 import { AdjustStockModal } from "../features/inventory/components/AdjustStockModal";
 import { StockLegend } from "../features/inventory/components/StockLegend";
 import { RestoreConfirmDialog } from "../features/inventory/components/RestoreConfirmDialog";
+import { PermanentDeleteConfirmDialog } from "../features/inventory/components/PermanentDeleteConfirmDialog";
 import { SortValue } from "../features/inventory/components/SortControls";
 
 export function InventoryPage() {
@@ -36,11 +37,13 @@ export function InventoryPage() {
   const editModal = useDisclosure();
   const deleteDialog = useDisclosure();
   const restoreDialog = useDisclosure();
+  const permanentDeleteDialog = useDisclosure();
   const adjustStockModal = useDisclosure();
 
   const [editingDish, setEditingDish] = useState<Dish | null>(null);
   const [deletingDish, setDeletingDish] = useState<{ id: DishId; name: string } | null>(null);
   const [restoringDish, setRestoringDish] = useState<{ id: DishId; name: string } | null>(null);
+  const [permanentlyDeletingDish, setPermanentlyDeletingDish] = useState<{ id: DishId; name: string } | null>(null);
   const [adjustingDish, setAdjustingDish] = useState<Dish | null>(null);
 
   function handleEdit(dish: Dish) {
@@ -75,6 +78,16 @@ export function InventoryPage() {
     setRestoringDish(null);
   }
 
+  function handlePermanentDelete(dish: Dish) {
+    setPermanentlyDeletingDish({ id: dish.id, name: dish.name });
+    permanentDeleteDialog.onOpen();
+  }
+
+  function handlePermanentDeleteClose() {
+    permanentDeleteDialog.onClose();
+    setPermanentlyDeletingDish(null);
+  }
+
   function handleAdjustStock(dish: Dish) {
     setAdjustingDish(dish);
     adjustStockModal.onOpen();
@@ -97,7 +110,7 @@ export function InventoryPage() {
 
       <StockLegend />
 
-      <InventoryTable dishes={dishes} isLoading={isLoading} hasActiveFilters={hasActiveFilters} onEdit={handleEdit} onDelete={handleDelete} onRestore={handleRestore} onAdjustStock={handleAdjustStock} onClearFilters={handleClearFilters} />
+      <InventoryTable dishes={dishes} isLoading={isLoading} hasActiveFilters={hasActiveFilters} onEdit={handleEdit} onDelete={handleDelete} onRestore={handleRestore} onAdjustStock={handleAdjustStock} onPermanentDelete={handlePermanentDelete} onClearFilters={handleClearFilters} />
 
       <CreateDishModal isOpen={createModal.isOpen} onClose={createModal.onClose} />
 
@@ -106,6 +119,8 @@ export function InventoryPage() {
       <DeleteConfirmDialog dishId={deletingDish?.id ?? null} dishName={deletingDish?.name ?? ""} isOpen={deleteDialog.isOpen} onClose={handleDeleteClose} />
 
       <RestoreConfirmDialog dishId={restoringDish?.id ?? null} dishName={restoringDish?.name ?? ""} isOpen={restoreDialog.isOpen} onClose={handleRestoreClose} />
+
+      <PermanentDeleteConfirmDialog dishId={permanentlyDeletingDish?.id ?? null} dishName={permanentlyDeletingDish?.name ?? ""} isOpen={permanentDeleteDialog.isOpen} onClose={handlePermanentDeleteClose} />
 
       <AdjustStockModal dish={adjustingDish} isOpen={adjustStockModal.isOpen} onClose={handleAdjustStockClose} />
     </Box>
