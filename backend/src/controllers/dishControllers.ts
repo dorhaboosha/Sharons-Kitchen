@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { getDishes, getDishById, createDish, updateDish, adjustStock } from "../services/dishService";
+import { getDishes, getDishById, createDish, updateDish, adjustStock, deleteDishPermanently } from "../services/dishService";
 import { sendSuccess } from "../utils/response";
 import { CreateDishData, UpdateDishData, AdjustStockData, GetDishesQueryData } from "@sharons-kitchen/shared";
 
@@ -51,7 +51,18 @@ export async function adjustStockController(req: Request, res: Response, next: N
     const id = Number(req.params.id);
     const dish = await adjustStock(id, (req.body as AdjustStockData).delta);
     sendSuccess(res, dish);
-  } 
+  }
+  catch (err) {
+    next(err);
+  }
+}
+
+export async function deleteDishController(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const id = Number(req.params.id);
+    await deleteDishPermanently(id);
+    sendSuccess(res, null);
+  }
   catch (err) {
     next(err);
   }
