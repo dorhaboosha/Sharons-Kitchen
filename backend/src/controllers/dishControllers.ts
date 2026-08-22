@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { getDishes, getDishById, createDish, updateDish, adjustStock, deleteDishPermanently } from "../services/dishService";
 import { sendSuccess } from "../utils/response";
+import { parseId } from "../utils/parseId";
 import { CreateDishData, UpdateDishData, AdjustStockData, GetDishesQueryData } from "@sharons-kitchen/shared";
 
 export async function getDishesController(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -16,7 +17,7 @@ export async function getDishesController(req: Request, res: Response, next: Nex
 
 export async function getDishByIdController(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const id = Number(req.params.id);
+    const id = parseId(req.params.id);
     const dish = await getDishById(id);
     sendSuccess(res, dish);
   } 
@@ -37,7 +38,7 @@ export async function createDishController(req: Request, res: Response, next: Ne
 
 export async function updateDishController(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const id = Number(req.params.id);
+    const id = parseId(req.params.id);
     const dish = await updateDish(id, req.body as UpdateDishData);
     sendSuccess(res, dish);
   } 
@@ -48,7 +49,7 @@ export async function updateDishController(req: Request, res: Response, next: Ne
 
 export async function adjustStockController(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const id = Number(req.params.id);
+    const id = parseId(req.params.id);
     const dish = await adjustStock(id, (req.body as AdjustStockData).delta);
     sendSuccess(res, dish);
   }
@@ -59,7 +60,7 @@ export async function adjustStockController(req: Request, res: Response, next: N
 
 export async function deleteDishController(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const id = Number(req.params.id);
+    const id = parseId(req.params.id);
     await deleteDishPermanently(id);
     sendSuccess(res, null);
   }

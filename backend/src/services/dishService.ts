@@ -114,14 +114,13 @@ export async function adjustStock(id: number, delta: number) {
 }
 
 export async function deleteDishPermanently(id: number) {
-  const dish = await prisma.dish.findUnique({ where: { id } });
-  if (!dish) {
-    throw new AppError("NOT_FOUND", 404, "המנה לא נמצאה");
-  }
+  const { count } = await prisma.dish.deleteMany({ where: { id, isActive: false } });
 
-  if (dish.isActive) {
+  if (count === 0) {
+    const dish = await prisma.dish.findUnique({ where: { id } });
+    if (!dish) {
+      throw new AppError("NOT_FOUND", 404, "המנה לא נמצאה");
+    }
     throw new AppError("VALIDATION_ERROR", 400, "ניתן למחוק לצמיתות רק מנה לא פעילה");
   }
-
-  await prisma.dish.delete({ where: { id } });
 }
