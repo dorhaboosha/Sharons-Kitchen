@@ -38,3 +38,9 @@ export function adjustStock(id: DishId, input: AdjustStockInput): Promise<Dish> 
     body: JSON.stringify(input),
   });
 }
+
+export function deleteDishPermanently(id: DishId): Promise<null> {
+  return apiFetch<null>(`/api/dishes/${id}`, {
+    method: "DELETE",
+  });
+}
