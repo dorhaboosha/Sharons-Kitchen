@@ -3,6 +3,7 @@ import { ApiClientError } from "../services/apiClient";
 
 const errorMessages: Record<ApiErrorCode, string> = {
   VALIDATION_ERROR: "הנתונים שהוזנו אינם תקינים",
+  UNAUTHORIZED: "נדרשת הזדהות מחדש",
   NOT_FOUND: "הפריט המבוקש לא נמצא",
   CONFLICT: "כבר קיימת מנה בשם הזה",
   RATE_LIMITED: "יותר מדי בקשות, נסה שוב מאוחר יותר",

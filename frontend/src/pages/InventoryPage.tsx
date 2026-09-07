@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Box, Heading, useDisclosure } from "@chakra-ui/react";
+import { Box, Button, Flex, Heading, useDisclosure } from "@chakra-ui/react";
 import { Dish, DishId, GetDishesQueryData } from "@sharons-kitchen/shared";
+import { useAuth } from "../app/AuthProvider";
 import { useInventory } from "../features/inventory/hooks/useInventory";
 import { InventoryToolbar } from "../features/inventory/components/InventoryToolbar";
 import { InventoryTable } from "../features/inventory/components/InventoryTable";
@@ -14,6 +15,7 @@ import { PermanentDeleteConfirmDialog } from "../features/inventory/components/P
 import { SortValue } from "../features/inventory/components/SortControls";
 
 export function InventoryPage() {
+  const { logout } = useAuth();
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<GetDishesQueryData["filter"]>("all");
   const [sort, setSort] = useState<SortValue>("");
@@ -104,9 +106,21 @@ export function InventoryPage() {
 
   return (
     <Box maxW="1200px" mx="auto" px={{ base: 3, md: 6 }} py={{ base: 4, md: 8 }} dir="rtl">
-      <Heading size="2xl" textAlign="center" mb={8}>
-        ניהול מלאי
-      </Heading>
+      <Flex align="center" mb={8} position="relative">
+        <Heading size="2xl" textAlign="center" flex="1">
+          ניהול מלאי
+        </Heading>
+        <Button
+          size="sm"
+          variant="ghost"
+          colorScheme="brand"
+          onClick={logout}
+          position="absolute"
+          insetInlineEnd={0}
+        >
+          יציאה
+        </Button>
+      </Flex>
 
       <InventoryToolbar
         search={search}

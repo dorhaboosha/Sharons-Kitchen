@@ -16,6 +16,12 @@ const EnvSchema = z
       .url("must be a full URL, e.g. https://your-frontend.onrender.com")
       .transform((u) => u.replace(/\/+$/, "")) // browsers send an origin with no trailing slash
       .optional(),
+    // Shared credential the frontend must present as `Authorization: Bearer <token>`.
+    // Interim gate until real per-user auth exists.
+    API_ACCESS_TOKEN: z
+      .string()
+      .min(16, "must be at least 16 characters (use a long random value)")
+      .optional(),
   })
   .superRefine((env, ctx) => {
     if (env.NODE_ENV === "production" && !env.FRONTEND_URL) {
@@ -25,6 +31,13 @@ const EnvSchema = z
         message: "required in production (the browser origin allowed by CORS)",
       });
     }
+    if (env.NODE_ENV === "production" && !env.API_ACCESS_TOKEN) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["API_ACCESS_TOKEN"],
+        message: "required in production (the shared API credential)",
+      });
+    }
   });
 
 export interface AppConfig {
@@ -32,6 +45,8 @@ export interface AppConfig {
   PORT: number;
   DATABASE_URL: string;
   frontendUrl: string;
+  /** Shared bearer credential; undefined only in dev (auth then disabled). */
+  apiAccessToken: string | undefined;
   isProduction: boolean;
 }
 
@@ -53,6 +68,7 @@ export function parseEnv(env: NodeJS.ProcessEnv): AppConfig {
     DATABASE_URL: data.DATABASE_URL,
     // In development, fall back to the Vite dev-server origin.
     frontendUrl: data.FRONTEND_URL ?? "http://localhost:5173",
+    apiAccessToken: data.API_ACCESS_TOKEN,
     isProduction: data.NODE_ENV === "production",
   };
 }

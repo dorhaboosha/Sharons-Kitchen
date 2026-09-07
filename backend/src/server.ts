@@ -5,8 +5,10 @@ import compression from "compression";
 import rateLimit from "express-rate-limit";
 import { loadConfigOrExit } from "./config";
 import { errorHandler } from "./middlewares/errorHandler";
+import { requireApiToken } from "./middlewares/auth";
 import { sendError } from "./utils/response";
 import dishesRouter from "./routes/dishes";
+import authRouter from "./routes/auth";
 
 const config = loadConfigOrExit();
 
@@ -44,11 +46,16 @@ const writeLimiter = rateLimit({
     sendError(res, 429, "RATE_LIMITED", "יותר מדי בקשות כתיבה, נסה שוב מאוחר יותר"),
 });
 
+// Health check stays open so platform probes are unaffected.
 app.get("/api/health", (_req, res) => {
   res.json({ success: true, data: { status: "ok" } });
 });
 
-app.use("/api/dishes", apiLimiter, writeLimiter, dishesRouter);
+// Interim shared-credential gate on everything else under /api.
+const requireAuth = requireApiToken(config.apiAccessToken);
+
+app.use("/api/auth", apiLimiter, requireAuth, authRouter);
+app.use("/api/dishes", apiLimiter, writeLimiter, requireAuth, dishesRouter);
 
 app.use(errorHandler);
 

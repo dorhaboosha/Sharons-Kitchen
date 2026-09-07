@@ -1,6 +1,11 @@
 /** Error codes returned by the API in error envelopes. */
 export type ApiErrorCode =
-  "VALIDATION_ERROR" | "NOT_FOUND" | "CONFLICT" | "RATE_LIMITED" | "INTERNAL_ERROR";
+  | "VALIDATION_ERROR"
+  | "UNAUTHORIZED"
+  | "NOT_FOUND"
+  | "CONFLICT"
+  | "RATE_LIMITED"
+  | "INTERNAL_ERROR";
 
 /** Successful response envelope. */
 export interface ApiSuccess<T> {

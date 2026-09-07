@@ -93,16 +93,40 @@ Three separate Render services:
 
 **Environment variables required:**
 
-- Backend: `DATABASE_URL`, `FRONTEND_URL`, `NODE_ENV=production`, `NPM_CONFIG_PRODUCTION=false`
+- Backend: `DATABASE_URL`, `FRONTEND_URL`, `API_ACCESS_TOKEN`, `NODE_ENV=production`, `NPM_CONFIG_PRODUCTION=false`
 - Frontend: `VITE_API_URL`, `NPM_CONFIG_PRODUCTION=false`
+
+The backend validates its environment on startup and exits with a clear message
+if `DATABASE_URL`, `FRONTEND_URL`, or `API_ACCESS_TOKEN` is missing/invalid in
+production. `FRONTEND_URL` must be the exact browser origin (scheme + host, no
+trailing slash). Generate `API_ACCESS_TOKEN` with e.g. `openssl rand -base64 32`.
 
 Every `git push` to `main` triggers an automatic redeploy of both services.
 
 ---
 
+## Authentication (interim)
+
+The admin API is gated by a **single shared password**, not per-user accounts
+yet. The operator enters it once on the login screen; the frontend stores it in
+`localStorage` and sends it as `Authorization: Bearer <token>` on every request.
+The backend compares it (constant-time) against `API_ACCESS_TOKEN`.
+
+- The password is **never** in the built frontend bundle — only in the backend
+  environment and each authorized browser.
+- `/api/health` stays open; everything else under `/api` requires the token.
+- In development, if `API_ACCESS_TOKEN` is unset the API runs unauthenticated
+  with a startup warning.
+
+This is a stopgap. Real per-user accounts with httpOnly-cookie sessions are on
+the Next Steps list below.
+
+---
+
 ## Next Steps
 
-- [ ] **Login & authentication** — protect the admin area with a login page (email + password or social login)
+- [x] **Login gate (interim)** — shared-password bearer credential on the whole API (see "Authentication" above)
+- [ ] **Real authentication** — per-user accounts, hashed passwords, httpOnly-cookie sessions, logout
 - [ ] **Sign up page** — allow new admin accounts to be created
 - [ ] **Customers area** — a separate customer-facing section for browsing the menu
 - [ ] **New dish ideas page** — AI-assisted page for generating creative new dish ideas based on existing inventory
