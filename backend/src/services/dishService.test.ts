@@ -1,0 +1,263 @@
+import { describe, it, expect, vi, beforeEach } from "vitest";
+
+vi.mock("../prisma/client", () => ({
+  prisma: {
+    dish: {
+      findUnique: vi.fn(),
+      findMany: vi.fn(),
+      create: vi.fn(),
+      update: vi.fn(),
+      deleteMany: vi.fn(),
+    },
+  },
+}));
+
+import { prisma } from "../prisma/client";
+import {
+  getDishById,
+  createDish,
+  updateDish,
+  adjustStock,
+  deleteDishPermanently,
+} from "./dishService";
+
+const findUnique = vi.mocked(prisma.dish.findUnique);
+const create = vi.mocked(prisma.dish.create);
+const update = vi.mocked(prisma.dish.update);
+const deleteMany = vi.mocked(prisma.dish.deleteMany);
+
+type DishRow = {
+  id: number;
+  name: string;
+  price: number;
+  quantity: number;
+  unitsPerBox: number | null;
+  description: string | null;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+function makeDish(overrides: Partial<DishRow> = {}): DishRow {
+  return {
+    id: 1,
+    name: "קובה סלק",
+    price: 10,
+    quantity: 5,
+    unitsPerBox: null,
+    description: null,
+    isActive: true,
+    createdAt: new Date("2026-01-01T00:00:00Z"),
+    updatedAt: new Date("2026-01-01T00:00:00Z"),
+    ...overrides,
+  };
+}
+
+// The mocked delegate methods are loosely typed here; the service only ever
+// awaits their resolved value.
+const resolve = (value: unknown) => value as never;
+
+beforeEach(() => {
+  vi.clearAllMocks();
+});
+
+describe("getDishById", () => {
+  it("returns the dish when it exists", async () => {
+    const dish = makeDish();
+    findUnique.mockResolvedValue(resolve(dish));
+
+    await expect(getDishById(1)).resolves.toEqual(dish);
+    expect(findUnique).toHaveBeenCalledWith({ where: { id: 1 } });
+  });
+
+  it("throws NOT_FOUND when the dish is missing", async () => {
+    findUnique.mockResolvedValue(resolve(null));
+
+    await expect(getDishById(999)).rejects.toMatchObject({
+      code: "NOT_FOUND",
+      statusCode: 404,
+    });
+  });
+});
+
+describe("createDish", () => {
+  it("normalizes the name and creates the dish with nulls for omitted optionals", async () => {
+    findUnique.mockResolvedValue(resolve(null));
+    const created = makeDish({ name: "קובה סלק" });
+    create.mockResolvedValue(resolve(created));
+
+    const result = await createDish({
+      name: "  קובה   סלק  ",
+      price: 12,
+      quantity: 3,
+    });
+
+    expect(findUnique).toHaveBeenCalledWith({ where: { name: "קובה סלק" } });
+    expect(create).toHaveBeenCalledWith({
+      data: {
+        name: "קובה סלק",
+        price: 12,
+        quantity: 3,
+        unitsPerBox: null,
+        description: null,
+      },
+    });
+    expect(result).toEqual(created);
+  });
+
+  it("throws CONFLICT and does not create when the name already exists", async () => {
+    findUnique.mockResolvedValue(resolve(makeDish()));
+
+    await expect(createDish({ name: "קובה סלק", price: 10, quantity: 1 })).rejects.toMatchObject({
+      code: "CONFLICT",
+      statusCode: 409,
+    });
+
+    expect(create).not.toHaveBeenCalled();
+  });
+});
+
+describe("updateDish", () => {
+  it("throws NOT_FOUND when the dish is missing", async () => {
+    findUnique.mockResolvedValue(resolve(null));
+
+    await expect(updateDish(1, { price: 5 })).rejects.toMatchObject({
+      code: "NOT_FOUND",
+      statusCode: 404,
+    });
+    expect(update).not.toHaveBeenCalled();
+  });
+
+  it("blocks editing an inactive dish when isActive is not being set to true", async () => {
+    findUnique.mockResolvedValue(resolve(makeDish({ isActive: false })));
+
+    await expect(updateDish(1, { price: 5 })).rejects.toMatchObject({
+      code: "VALIDATION_ERROR",
+      statusCode: 400,
+    });
+    expect(update).not.toHaveBeenCalled();
+  });
+
+  it("allows restoring an inactive dish (isActive: true)", async () => {
+    findUnique.mockResolvedValue(resolve(makeDish({ isActive: false })));
+    update.mockResolvedValue(resolve(makeDish({ isActive: true })));
+
+    await updateDish(1, { isActive: true });
+
+    expect(update).toHaveBeenCalledWith({ where: { id: 1 }, data: { isActive: true } });
+  });
+
+  it("throws CONFLICT when the new name belongs to a different dish", async () => {
+    findUnique
+      .mockResolvedValueOnce(resolve(makeDish({ id: 1 }))) // the dish being updated
+      .mockResolvedValueOnce(resolve(makeDish({ id: 2, name: "שם אחר" }))); // name owner
+
+    await expect(updateDish(1, { name: "שם אחר" })).rejects.toMatchObject({
+      code: "CONFLICT",
+      statusCode: 409,
+    });
+    expect(update).not.toHaveBeenCalled();
+  });
+
+  it("allows renaming when the matching name is the same dish", async () => {
+    findUnique
+      .mockResolvedValueOnce(resolve(makeDish({ id: 1 })))
+      .mockResolvedValueOnce(resolve(makeDish({ id: 1 })));
+    update.mockResolvedValue(resolve(makeDish()));
+
+    await updateDish(1, { name: "  קובה סלק  " });
+
+    expect(update).toHaveBeenCalledWith({
+      where: { id: 1 },
+      data: expect.objectContaining({ name: "קובה סלק" }),
+    });
+  });
+
+  it("passes through a simple field update on an active dish", async () => {
+    findUnique.mockResolvedValue(resolve(makeDish()));
+    update.mockResolvedValue(resolve(makeDish({ price: 20 })));
+
+    await updateDish(1, { price: 20 });
+
+    expect(update).toHaveBeenCalledWith({ where: { id: 1 }, data: { price: 20 } });
+  });
+});
+
+describe("adjustStock", () => {
+  it("throws NOT_FOUND when the dish is missing", async () => {
+    findUnique.mockResolvedValue(resolve(null));
+
+    await expect(adjustStock(1, 3)).rejects.toMatchObject({
+      code: "NOT_FOUND",
+      statusCode: 404,
+    });
+  });
+
+  it("refuses to adjust stock on an inactive dish", async () => {
+    findUnique.mockResolvedValue(resolve(makeDish({ isActive: false })));
+
+    await expect(adjustStock(1, 3)).rejects.toMatchObject({
+      code: "VALIDATION_ERROR",
+      statusCode: 400,
+    });
+    expect(update).not.toHaveBeenCalled();
+  });
+
+  it("refuses to let quantity go below zero", async () => {
+    findUnique.mockResolvedValue(resolve(makeDish({ quantity: 2 })));
+
+    await expect(adjustStock(1, -3)).rejects.toMatchObject({
+      code: "VALIDATION_ERROR",
+      statusCode: 400,
+    });
+    expect(update).not.toHaveBeenCalled();
+  });
+
+  it("allows an adjustment that lands exactly on zero", async () => {
+    findUnique.mockResolvedValue(resolve(makeDish({ quantity: 3 })));
+    update.mockResolvedValue(resolve(makeDish({ quantity: 0 })));
+
+    await adjustStock(1, -3);
+
+    expect(update).toHaveBeenCalledWith({ where: { id: 1 }, data: { quantity: 0 } });
+  });
+
+  it("adds the delta to the current quantity", async () => {
+    findUnique.mockResolvedValue(resolve(makeDish({ quantity: 5 })));
+    update.mockResolvedValue(resolve(makeDish({ quantity: 12 })));
+
+    await adjustStock(1, 7);
+
+    expect(update).toHaveBeenCalledWith({ where: { id: 1 }, data: { quantity: 12 } });
+  });
+});
+
+describe("deleteDishPermanently", () => {
+  it("resolves when an inactive dish is deleted", async () => {
+    deleteMany.mockResolvedValue(resolve({ count: 1 }));
+
+    await expect(deleteDishPermanently(1)).resolves.toBeUndefined();
+    expect(deleteMany).toHaveBeenCalledWith({ where: { id: 1, isActive: false } });
+    expect(findUnique).not.toHaveBeenCalled();
+  });
+
+  it("throws VALIDATION_ERROR when the dish exists but is still active", async () => {
+    deleteMany.mockResolvedValue(resolve({ count: 0 }));
+    findUnique.mockResolvedValue(resolve(makeDish({ isActive: true })));
+
+    await expect(deleteDishPermanently(1)).rejects.toMatchObject({
+      code: "VALIDATION_ERROR",
+      statusCode: 400,
+    });
+  });
+
+  it("throws NOT_FOUND when no such dish exists", async () => {
+    deleteMany.mockResolvedValue(resolve({ count: 0 }));
+    findUnique.mockResolvedValue(resolve(null));
+
+    await expect(deleteDishPermanently(1)).rejects.toMatchObject({
+      code: "NOT_FOUND",
+      statusCode: 404,
+    });
+  });
+});
