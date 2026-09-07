@@ -4,7 +4,11 @@ const BASE_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
 
 /** Thrown when the API returns `{ success: false, error: ... }`. */
 export class ApiClientError extends Error {
-  constructor(public readonly code: ApiErrorCode, message: string, public readonly details?: unknown) {
+  constructor(
+    public readonly code: ApiErrorCode,
+    message: string,
+    public readonly details?: unknown,
+  ) {
     super(message);
     this.name = "ApiClientError";
   }
@@ -28,11 +32,7 @@ export async function apiFetch<T>(path: string, options: RequestInit = {}): Prom
   const envelope = (await res.json()) as ApiResponse<T>;
 
   if (!envelope.success) {
-    throw new ApiClientError(
-      envelope.error.code,
-      envelope.error.message,
-      envelope.error.details
-    );
+    throw new ApiClientError(envelope.error.code, envelope.error.message, envelope.error.details);
   }
 
   return envelope.data;

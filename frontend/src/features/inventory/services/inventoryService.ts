@@ -1,12 +1,19 @@
 import { apiFetch } from "../../../services/apiClient";
-import { Dish, DishId, CreateDishInput, UpdateDishInput, AdjustStockInput, GetDishesQueryData} from "@sharons-kitchen/shared";
+import {
+  Dish,
+  DishId,
+  CreateDishInput,
+  UpdateDishInput,
+  AdjustStockInput,
+  GetDishesQueryData,
+} from "@sharons-kitchen/shared";
 
 function buildQuery(params: GetDishesQueryData): string {
   const entries = Object.entries(params).filter(([, v]) => v !== undefined);
   if (entries.length === 0) {
     return "";
   }
-  
+
   return "?" + new URLSearchParams(entries as [string, string][]).toString();
 }
 

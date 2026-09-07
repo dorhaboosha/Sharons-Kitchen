@@ -25,7 +25,8 @@ export function InventoryPage() {
 
   const { data: dishes = [], isLoading } = useInventory({ search, filter, sortBy, sortOrder });
 
-  const hasActiveFilters = Boolean(search) || (filter !== undefined && filter !== "all") || Boolean(sort);
+  const hasActiveFilters =
+    Boolean(search) || (filter !== undefined && filter !== "all") || Boolean(sort);
 
   function handleClearFilters() {
     setSearch("");
@@ -43,7 +44,10 @@ export function InventoryPage() {
   const [editingDish, setEditingDish] = useState<Dish | null>(null);
   const [deletingDish, setDeletingDish] = useState<{ id: DishId; name: string } | null>(null);
   const [restoringDish, setRestoringDish] = useState<{ id: DishId; name: string } | null>(null);
-  const [permanentlyDeletingDish, setPermanentlyDeletingDish] = useState<{ id: DishId; name: string } | null>(null);
+  const [permanentlyDeletingDish, setPermanentlyDeletingDish] = useState<{
+    id: DishId;
+    name: string;
+  } | null>(null);
   const [adjustingDish, setAdjustingDish] = useState<Dish | null>(null);
 
   function handleEdit(dish: Dish) {
@@ -104,25 +108,60 @@ export function InventoryPage() {
         ניהול מלאי
       </Heading>
 
-      <InventoryToolbar search={search} onSearchChange={setSearch} filter={filter} onFilterChange={setFilter}
-        sort={sort} onSortChange={setSort}
-        onAddClick={createModal.onOpen} />
+      <InventoryToolbar
+        search={search}
+        onSearchChange={setSearch}
+        filter={filter}
+        onFilterChange={setFilter}
+        sort={sort}
+        onSortChange={setSort}
+        onAddClick={createModal.onOpen}
+      />
 
       <StockLegend />
 
-      <InventoryTable dishes={dishes} isLoading={isLoading} hasActiveFilters={hasActiveFilters} onEdit={handleEdit} onDelete={handleDelete} onRestore={handleRestore} onAdjustStock={handleAdjustStock} onPermanentDelete={handlePermanentDelete} onClearFilters={handleClearFilters} />
+      <InventoryTable
+        dishes={dishes}
+        isLoading={isLoading}
+        hasActiveFilters={hasActiveFilters}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+        onRestore={handleRestore}
+        onAdjustStock={handleAdjustStock}
+        onPermanentDelete={handlePermanentDelete}
+        onClearFilters={handleClearFilters}
+      />
 
       <CreateDishModal isOpen={createModal.isOpen} onClose={createModal.onClose} />
 
       <EditDishModal dish={editingDish} isOpen={editModal.isOpen} onClose={handleEditClose} />
 
-      <DeleteConfirmDialog dishId={deletingDish?.id ?? null} dishName={deletingDish?.name ?? ""} isOpen={deleteDialog.isOpen} onClose={handleDeleteClose} />
+      <DeleteConfirmDialog
+        dishId={deletingDish?.id ?? null}
+        dishName={deletingDish?.name ?? ""}
+        isOpen={deleteDialog.isOpen}
+        onClose={handleDeleteClose}
+      />
 
-      <RestoreConfirmDialog dishId={restoringDish?.id ?? null} dishName={restoringDish?.name ?? ""} isOpen={restoreDialog.isOpen} onClose={handleRestoreClose} />
+      <RestoreConfirmDialog
+        dishId={restoringDish?.id ?? null}
+        dishName={restoringDish?.name ?? ""}
+        isOpen={restoreDialog.isOpen}
+        onClose={handleRestoreClose}
+      />
 
-      <PermanentDeleteConfirmDialog dishId={permanentlyDeletingDish?.id ?? null} dishName={permanentlyDeletingDish?.name ?? ""} isOpen={permanentDeleteDialog.isOpen} onClose={handlePermanentDeleteClose} />
+      <PermanentDeleteConfirmDialog
+        dishId={permanentlyDeletingDish?.id ?? null}
+        dishName={permanentlyDeletingDish?.name ?? ""}
+        isOpen={permanentDeleteDialog.isOpen}
+        onClose={handlePermanentDeleteClose}
+      />
 
-      <AdjustStockModal dish={adjustingDish} isOpen={adjustStockModal.isOpen} onClose={handleAdjustStockClose} />
+      <AdjustStockModal
+        dish={adjustingDish}
+        isOpen={adjustStockModal.isOpen}
+        onClose={handleAdjustStockClose}
+      />
     </Box>
   );
 }

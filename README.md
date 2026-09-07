@@ -7,6 +7,7 @@ A Hebrew-first (RTL) inventory management web app for a ready-food business, bui
 ## What the app does
 
 ### Inventory Management
+
 - Add, edit, and soft-delete dishes (with restore support)
 - Adjust stock safely via add/subtract (cannot go below 0)
 - Search, filter (active / inactive / all), and sort inventory (by name, quantity, or price)
@@ -15,6 +16,7 @@ A Hebrew-first (RTL) inventory management web app for a ready-food business, bui
 - Backend guards: inactive dishes cannot be edited or have their stock adjusted
 
 ### UI & UX
+
 - Branded theme derived from the store logo (powder blue + dark chocolate brown)
 - Full-page background image with white overlay
 - Heebo font, RTL layout throughout
@@ -26,13 +28,13 @@ A Hebrew-first (RTL) inventory management web app for a ready-food business, bui
 
 ## Tech Stack
 
-| Layer | Technology |
-|---|---|
+| Layer    | Technology                                                                                       |
+| -------- | ------------------------------------------------------------------------------------------------ |
 | Frontend | React 18, TypeScript, Vite, Chakra UI (RTL), React Hook Form + Zod, TanStack Query, React Router |
-| Backend | Node.js, Express, TypeScript, Zod validation middleware, Prisma ORM |
-| Database | PostgreSQL (Docker locally, Render Postgres in production) |
-| Shared | Zod schemas and TypeScript types shared between frontend and backend via npm workspace |
-| Hosting | Render (frontend as Static Site, backend as Web Service, Render Postgres) |
+| Backend  | Node.js, Express, TypeScript, Zod validation middleware, Prisma ORM                              |
+| Database | PostgreSQL (Docker locally, Render Postgres in production)                                       |
+| Shared   | Zod schemas and TypeScript types shared between frontend and backend via npm workspace           |
+| Hosting  | Render (frontend as Static Site, backend as Web Service, Render Postgres)                        |
 
 ---
 
@@ -70,12 +72,12 @@ cd backend && npx prisma migrate dev --name init
 npm run dev
 ```
 
-| Service | URL |
-|---|---|
-| Frontend | http://localhost:5173 |
-| Backend API | http://localhost:3000/api |
+| Service      | URL                              |
+| ------------ | -------------------------------- |
+| Frontend     | http://localhost:5173            |
+| Backend API  | http://localhost:3000/api        |
 | Health check | http://localhost:3000/api/health |
-| Postgres | localhost:5433 |
+| Postgres     | localhost:5433                   |
 
 ---
 
@@ -83,13 +85,14 @@ npm run dev
 
 Three separate Render services:
 
-| Service | Type | Notes |
-|---|---|---|
-| `sharons-kitchen-db` | PostgreSQL | Internal connection string used by backend |
-| `sharons-kitchen-backend` | Web Service | Build: `npm install && npm run build:shared && cd backend && npx prisma generate && cd .. && npm run build --workspace=backend` · Start: `cd backend && npx prisma migrate deploy && node dist/server.js` |
-| `sharons-kitchen-frontend` | Static Site | Build: `npm install && npm run build:shared && npm run build --workspace=frontend` · Publish: `frontend/dist` |
+| Service                    | Type        | Notes                                                                                                                                                                                                     |
+| -------------------------- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `sharons-kitchen-db`       | PostgreSQL  | Internal connection string used by backend                                                                                                                                                                |
+| `sharons-kitchen-backend`  | Web Service | Build: `npm install && npm run build:shared && cd backend && npx prisma generate && cd .. && npm run build --workspace=backend` · Start: `cd backend && npx prisma migrate deploy && node dist/server.js` |
+| `sharons-kitchen-frontend` | Static Site | Build: `npm install && npm run build:shared && npm run build --workspace=frontend` · Publish: `frontend/dist`                                                                                             |
 
 **Environment variables required:**
+
 - Backend: `DATABASE_URL`, `FRONTEND_URL`, `NODE_ENV=production`, `NPM_CONFIG_PRODUCTION=false`
 - Frontend: `VITE_API_URL`, `NPM_CONFIG_PRODUCTION=false`
 

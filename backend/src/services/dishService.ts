@@ -27,13 +27,13 @@ export async function getDishes(params: GetDishesParams = {}) {
   if (search && search.trim() !== "") {
     where.name = { contains: search.trim(), mode: "insensitive" };
   }
-  
+
   // --- Sort ---
   // Always keep active dishes first.
   // If sortBy is provided, apply it *within* active/inactive groups.
   const orderBy: Prisma.DishOrderByWithRelationInput[] = sortBy
-  ? [{ isActive: "desc" }, { [sortBy]: sortOrder }, { name: "asc" }]
-  : [{ isActive: "desc" }, { name: "asc" }];
+    ? [{ isActive: "desc" }, { [sortBy]: sortOrder }, { name: "asc" }]
+    : [{ isActive: "desc" }, { name: "asc" }];
 
   return prisma.dish.findMany({ where, orderBy });
 }

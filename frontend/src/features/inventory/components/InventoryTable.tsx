@@ -1,5 +1,19 @@
 import { Dish, DishId } from "@sharons-kitchen/shared";
-import { Table, Thead, Tbody, Tr, Th, Td, TableContainer, Text, HStack, Button, Skeleton, VStack, Box } from "@chakra-ui/react";
+import {
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td,
+  TableContainer,
+  Text,
+  HStack,
+  Button,
+  Skeleton,
+  VStack,
+  Box,
+} from "@chakra-ui/react";
 
 const SKELETON_ROWS = 5;
 const LOW_STOCK_THRESHOLD = 5;
@@ -40,13 +54,21 @@ const COLUMNS = [
   { key: "actions", label: "פעולות" },
 ] as const;
 
-function EmptyState({ hasActiveFilters, onClearFilters }: { hasActiveFilters: boolean; onClearFilters?: () => void }) {
+function EmptyState({
+  hasActiveFilters,
+  onClearFilters,
+}: {
+  hasActiveFilters: boolean;
+  onClearFilters?: () => void;
+}) {
   if (hasActiveFilters) {
     return (
       <Tr>
         <Td colSpan={COLUMNS.length} py={16}>
           <VStack spacing={3} align="center">
-            <Box fontSize="4xl" lineHeight={1}>🔍</Box>
+            <Box fontSize="4xl" lineHeight={1}>
+              🔍
+            </Box>
             <Text fontWeight="semibold" fontSize="lg" color="black">
               לא נמצאו תוצאות
             </Text>
@@ -68,7 +90,9 @@ function EmptyState({ hasActiveFilters, onClearFilters }: { hasActiveFilters: bo
     <Tr>
       <Td colSpan={COLUMNS.length} py={16}>
         <VStack spacing={3} align="center">
-          <Box fontSize="4xl" lineHeight={1}>🍽️</Box>
+          <Box fontSize="4xl" lineHeight={1}>
+            🍽️
+          </Box>
           <Text fontWeight="semibold" fontSize="lg" color="black">
             המלאי ריק
           </Text>
@@ -81,11 +105,31 @@ function EmptyState({ hasActiveFilters, onClearFilters }: { hasActiveFilters: bo
   );
 }
 
-export function InventoryTable({ dishes, isLoading = false, hasActiveFilters = false, onEdit, onDelete, onRestore, onAdjustStock, onPermanentDelete, onClearFilters }: InventoryTableProps) {
+export function InventoryTable({
+  dishes,
+  isLoading = false,
+  hasActiveFilters = false,
+  onEdit,
+  onDelete,
+  onRestore,
+  onAdjustStock,
+  onPermanentDelete,
+  onClearFilters,
+}: InventoryTableProps) {
   return (
-    <TableContainer borderWidth={2} borderRadius="md" borderColor="gray.500" overflowX="auto" bg="whiteAlpha.800">
-      <Table variant="simple" size="md" dir="rtl"
-        sx={{ "td, th": { borderColor: "gray.700" }, "tr:last-child td": { borderBottom: "none" } }}>
+    <TableContainer
+      borderWidth={2}
+      borderRadius="md"
+      borderColor="gray.500"
+      overflowX="auto"
+      bg="whiteAlpha.800"
+    >
+      <Table
+        variant="simple"
+        size="md"
+        dir="rtl"
+        sx={{ "td, th": { borderColor: "gray.700" }, "tr:last-child td": { borderBottom: "none" } }}
+      >
         <Thead bg="gray.100">
           <Tr>
             {COLUMNS.map((col) => (
@@ -111,12 +155,22 @@ export function InventoryTable({ dishes, isLoading = false, hasActiveFilters = f
           ) : (
             dishes.map((dish) => (
               <Tr key={dish.id} bg={getRowBg(dish)}>
-                <Td textAlign="center" color="gray.800" fontWeight={dish.isActive ? "medium" : "normal"}>
+                <Td
+                  textAlign="center"
+                  color="gray.800"
+                  fontWeight={dish.isActive ? "medium" : "normal"}
+                >
                   {dish.name}
                 </Td>
-                <Td textAlign="center" color="gray.800">₪{dish.price}</Td>
-                <Td textAlign="center" color="gray.800">{dish.quantity}</Td>
-                <Td textAlign="center" color="gray.800">{dish.unitsPerBox ?? "—"}</Td>
+                <Td textAlign="center" color="gray.800">
+                  ₪{dish.price}
+                </Td>
+                <Td textAlign="center" color="gray.800">
+                  {dish.quantity}
+                </Td>
+                <Td textAlign="center" color="gray.800">
+                  {dish.unitsPerBox ?? "—"}
+                </Td>
                 <Td textAlign="center" color="gray.800" maxW="200px" isTruncated>
                   {dish.description ?? "—"}
                 </Td>
@@ -124,23 +178,48 @@ export function InventoryTable({ dishes, isLoading = false, hasActiveFilters = f
                   <HStack spacing={2} justify="center">
                     {dish.isActive && (
                       <>
-                        <Button {...BTN_BASE} color="brand.700" borderColor="brand.400" onClick={() => onEdit(dish)}>
+                        <Button
+                          {...BTN_BASE}
+                          color="brand.700"
+                          borderColor="brand.400"
+                          onClick={() => onEdit(dish)}
+                        >
                           עריכה
                         </Button>
-                        <Button {...BTN_BASE} color="#5C3317" borderColor="#8B5A3A" onClick={() => onAdjustStock(dish)}>
+                        <Button
+                          {...BTN_BASE}
+                          color="#5C3317"
+                          borderColor="#8B5A3A"
+                          onClick={() => onAdjustStock(dish)}
+                        >
                           עדכון כמות
                         </Button>
-                        <Button {...BTN_BASE} color="red.600" borderColor="red.400" onClick={() => onDelete(dish.id)}>
+                        <Button
+                          {...BTN_BASE}
+                          color="red.600"
+                          borderColor="red.400"
+                          onClick={() => onDelete(dish.id)}
+                        >
                           מחיקה
                         </Button>
                       </>
                     )}
                     {!dish.isActive && (
                       <>
-                        <Button {...BTN_BASE} color="green.700" borderColor="green.500" onClick={() => onRestore(dish)}>
+                        <Button
+                          {...BTN_BASE}
+                          color="green.700"
+                          borderColor="green.500"
+                          onClick={() => onRestore(dish)}
+                        >
                           שחזור
                         </Button>
-                        <Button {...BTN_BASE} color="red.700" borderColor="red.500" onClick={() => onPermanentDelete(dish)}>
+                        <Button
+                          {...BTN_BASE}
+                          color="red.700"
+                          borderColor="red.500"
+                          onClick={() => onPermanentDelete(dish)}
+                        >
                           מחיקה לצמיתות
                         </Button>
                       </>

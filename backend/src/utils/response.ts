@@ -10,7 +10,7 @@ export function sendError(
   status: number,
   code: ApiErrorCode,
   message: string,
-  details?: unknown
+  details?: unknown,
 ): void {
   res.status(status).json({
     success: false,

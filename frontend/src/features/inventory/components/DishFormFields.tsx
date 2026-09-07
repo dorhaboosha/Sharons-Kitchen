@@ -1,5 +1,14 @@
-import { FormControl, FormLabel, FormErrorMessage, Input, NumberInput, NumberInputField,
-  NumberInputStepper, NumberIncrementStepper, NumberDecrementStepper } from "@chakra-ui/react";
+import {
+  FormControl,
+  FormLabel,
+  FormErrorMessage,
+  Input,
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper,
+  NumberIncrementStepper,
+  NumberDecrementStepper,
+} from "@chakra-ui/react";
 import { UseFormRegister, FieldErrors, Controller, Control } from "react-hook-form";
 import { CreateDishData } from "@sharons-kitchen/shared";
 
@@ -38,11 +47,27 @@ export function DishFormFields({ register, errors, control }: DishFormFieldsProp
       {/* Price — controlled so Chakra NumberInput shows/resets the RHF value correctly */}
       <FormControl isInvalid={!!errors.price} isRequired>
         <FormLabel {...LABEL_STYLES}>מחיר (₪)</FormLabel>
-        <Controller name="price" control={control} defaultValue={1} render={({ field }) => (
-            <NumberInput min={1} precision={0} dir="ltr" value={isNaN(field.value) ? "" : field.value}
-              onChange={(_, valueAsNumber) => field.onChange(isNaN(valueAsNumber) ? "" : valueAsNumber)}
+        <Controller
+          name="price"
+          control={control}
+          defaultValue={1}
+          render={({ field }) => (
+            <NumberInput
+              min={1}
+              precision={0}
+              dir="ltr"
+              value={isNaN(field.value) ? "" : field.value}
+              onChange={(_, valueAsNumber) =>
+                field.onChange(isNaN(valueAsNumber) ? "" : valueAsNumber)
+              }
               onBlur={() => {
-                if (field.value === undefined || field.value === null || (field.value as unknown as string) === "" || isNaN(field.value) || field.value < 1) {
+                if (
+                  field.value === undefined ||
+                  field.value === null ||
+                  (field.value as unknown as string) === "" ||
+                  isNaN(field.value) ||
+                  field.value < 1
+                ) {
                   field.onChange(1);
                 }
                 field.onBlur();
@@ -72,7 +97,9 @@ export function DishFormFields({ register, errors, control }: DishFormFieldsProp
               precision={0}
               dir="ltr"
               value={isNaN(field.value) ? "" : field.value}
-              onChange={(_, valueAsNumber) => field.onChange(isNaN(valueAsNumber) ? "" : valueAsNumber)}
+              onChange={(_, valueAsNumber) =>
+                field.onChange(isNaN(valueAsNumber) ? "" : valueAsNumber)
+              }
               onBlur={() => {
                 if (!field.value || isNaN(field.value) || field.value < 1) {
                   field.onChange(1);
@@ -94,9 +121,18 @@ export function DishFormFields({ register, errors, control }: DishFormFieldsProp
       {/* Units per box — optional; if a value is entered it must be ≥ 1 (corrected on blur) */}
       <FormControl isInvalid={!!errors.unitsPerBox}>
         <FormLabel {...LABEL_STYLES}>יחידות בקופסה</FormLabel>
-        <Controller name="unitsPerBox" control={control} render={({ field }) => (
-            <NumberInput min={1} precision={0} dir="ltr" value={field.value ?? ""}
-              onChange={(_, valueAsNumber) => field.onChange(isNaN(valueAsNumber) ? undefined : valueAsNumber)}
+        <Controller
+          name="unitsPerBox"
+          control={control}
+          render={({ field }) => (
+            <NumberInput
+              min={1}
+              precision={0}
+              dir="ltr"
+              value={field.value ?? ""}
+              onChange={(_, valueAsNumber) =>
+                field.onChange(isNaN(valueAsNumber) ? undefined : valueAsNumber)
+              }
               onBlur={() => {
                 if (field.value !== undefined && !isNaN(field.value) && field.value < 1) {
                   field.onChange(1);
@@ -117,7 +153,11 @@ export function DishFormFields({ register, errors, control }: DishFormFieldsProp
 
       <FormControl isInvalid={!!errors.description}>
         <FormLabel {...LABEL_STYLES}>תיאור</FormLabel>
-        <Input {...register("description")} placeholder="לדוגמה: קציצות ברוטב עגבניות" {...INPUT_STYLES} />
+        <Input
+          {...register("description")}
+          placeholder="לדוגמה: קציצות ברוטב עגבניות"
+          {...INPUT_STYLES}
+        />
         <FormErrorMessage>{errors.description?.message}</FormErrorMessage>
       </FormControl>
     </>
