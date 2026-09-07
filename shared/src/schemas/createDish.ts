@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const CreateDishSchema = z.object({
-  name: z.string().min(1, "שם המנה הוא שדה חובה"),
+  name: z.string().min(1, "שם המנה הוא שדה חובה").max(120, "שם המנה ארוך מדי (עד 120 תווים)"),
   price: z
     .number({ invalid_type_error: "המחיר חייב להיות מספר" })
     .int("המחיר חייב להיות מספר שלם")
@@ -15,7 +15,7 @@ export const CreateDishSchema = z.object({
     .int("יחידות בקופסה חייב להיות מספר שלם")
     .min(1, "חייב להיות מספר גדול מ-0")
     .optional(),
-  description: z.string().optional(),
+  description: z.string().max(1000, "התיאור ארוך מדי (עד 1000 תווים)").optional(),
 });
 
 export type CreateDishData = z.infer<typeof CreateDishSchema>;
