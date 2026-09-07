@@ -5,6 +5,7 @@ const errorMessages: Record<ApiErrorCode, string> = {
   VALIDATION_ERROR: "הנתונים שהוזנו אינם תקינים",
   NOT_FOUND: "הפריט המבוקש לא נמצא",
   CONFLICT: "כבר קיימת מנה בשם הזה",
+  RATE_LIMITED: "יותר מדי בקשות, נסה שוב מאוחר יותר",
   INTERNAL_ERROR: "אירעה שגיאה פנימית, נסה שנית",
 };
 
