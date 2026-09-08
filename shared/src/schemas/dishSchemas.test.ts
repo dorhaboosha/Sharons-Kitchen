@@ -3,7 +3,7 @@ import { CreateDishSchema } from "./createDish";
 import { UpdateDishSchema } from "./updateDish";
 import { GetDishesQuerySchema } from "./getDishesQuery";
 
-const validCreate = { name: "קובה סלק", price: 10, quantity: 3 };
+const validCreate = { name: "קובה סלק", priceAgorot: 1000, quantity: 3 };
 
 describe("CreateDishSchema", () => {
   it("accepts a minimal valid dish", () => {
@@ -32,6 +32,18 @@ describe("CreateDishSchema", () => {
   it("accepts a description of exactly 1000 characters", () => {
     const description = "א".repeat(1000);
     expect(CreateDishSchema.safeParse({ ...validCreate, description }).success).toBe(true);
+  });
+
+  it("requires priceAgorot to be at least ₪1 (100 agorot) and an integer", () => {
+    expect(CreateDishSchema.safeParse({ ...validCreate, priceAgorot: 99 }).success).toBe(false);
+    expect(CreateDishSchema.safeParse({ ...validCreate, priceAgorot: 100 }).success).toBe(true);
+    expect(CreateDishSchema.safeParse({ ...validCreate, priceAgorot: 12.5 }).success).toBe(false);
+  });
+
+  it("rejects a priceAgorot above the ₪100,000 ceiling", () => {
+    expect(CreateDishSchema.safeParse({ ...validCreate, priceAgorot: 10_000_001 }).success).toBe(
+      false,
+    );
   });
 });
 

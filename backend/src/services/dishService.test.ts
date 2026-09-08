@@ -33,7 +33,7 @@ const deleteMany = vi.mocked(prisma.dish.deleteMany);
 type DishRow = {
   id: number;
   name: string;
-  price: number;
+  priceAgorot: number;
   quantity: number;
   unitsPerBox: number | null;
   description: string | null;
@@ -46,7 +46,7 @@ function makeDish(overrides: Partial<DishRow> = {}): DishRow {
   return {
     id: 1,
     name: "קובה סלק",
-    price: 10,
+    priceAgorot: 1000,
     quantity: 5,
     unitsPerBox: null,
     description: null,
@@ -92,7 +92,7 @@ describe("createDish", () => {
 
     const result = await createDish({
       name: "  קובה   סלק  ",
-      price: 12,
+      priceAgorot: 1200,
       quantity: 3,
     });
 
@@ -100,7 +100,7 @@ describe("createDish", () => {
     expect(create).toHaveBeenCalledWith({
       data: {
         name: "קובה סלק",
-        price: 12,
+        priceAgorot: 1200,
         quantity: 3,
         unitsPerBox: null,
         description: null,
@@ -112,7 +112,9 @@ describe("createDish", () => {
   it("throws CONFLICT and does not create when the name already exists", async () => {
     findUnique.mockResolvedValue(resolve(makeDish()));
 
-    await expect(createDish({ name: "קובה סלק", price: 10, quantity: 1 })).rejects.toMatchObject({
+    await expect(
+      createDish({ name: "קובה סלק", priceAgorot: 1000, quantity: 1 }),
+    ).rejects.toMatchObject({
       code: "CONFLICT",
       statusCode: 409,
     });
@@ -125,7 +127,7 @@ describe("updateDish", () => {
   it("throws NOT_FOUND when the dish is missing", async () => {
     findUnique.mockResolvedValue(resolve(null));
 
-    await expect(updateDish(1, { price: 5 })).rejects.toMatchObject({
+    await expect(updateDish(1, { priceAgorot: 500 })).rejects.toMatchObject({
       code: "NOT_FOUND",
       statusCode: 404,
     });
@@ -135,7 +137,7 @@ describe("updateDish", () => {
   it("blocks editing an inactive dish when isActive is not being set to true", async () => {
     findUnique.mockResolvedValue(resolve(makeDish({ isActive: false })));
 
-    await expect(updateDish(1, { price: 5 })).rejects.toMatchObject({
+    await expect(updateDish(1, { priceAgorot: 500 })).rejects.toMatchObject({
       code: "VALIDATION_ERROR",
       statusCode: 400,
     });
@@ -179,11 +181,11 @@ describe("updateDish", () => {
 
   it("passes through a simple field update on an active dish", async () => {
     findUnique.mockResolvedValue(resolve(makeDish()));
-    update.mockResolvedValue(resolve(makeDish({ price: 20 })));
+    update.mockResolvedValue(resolve(makeDish({ priceAgorot: 2000 })));
 
-    await updateDish(1, { price: 20 });
+    await updateDish(1, { priceAgorot: 2000 });
 
-    expect(update).toHaveBeenCalledWith({ where: { id: 1 }, data: { price: 20 } });
+    expect(update).toHaveBeenCalledWith({ where: { id: 1 }, data: { priceAgorot: 2000 } });
   });
 });
 

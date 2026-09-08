@@ -4,7 +4,7 @@ import { AppError } from "../utils/AppError";
 import { normalizeName, CreateDishInput, UpdateDishInput } from "@sharons-kitchen/shared";
 
 export type FilterParam = "active" | "inactive" | "all";
-export type SortByParam = "name" | "quantity" | "price";
+export type SortByParam = "name" | "quantity" | "priceAgorot";
 export type SortOrderParam = "asc" | "desc";
 
 export interface GetDishesParams {
@@ -59,7 +59,7 @@ export async function createDish(input: CreateDishInput) {
   return prisma.dish.create({
     data: {
       name,
-      price: input.price,
+      priceAgorot: input.priceAgorot,
       quantity: input.quantity,
       unitsPerBox: input.unitsPerBox ?? null,
       description: input.description ?? null,

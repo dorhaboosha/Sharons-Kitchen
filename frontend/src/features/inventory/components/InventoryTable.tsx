@@ -1,4 +1,4 @@
-import { Dish, DishId } from "@sharons-kitchen/shared";
+import { Dish, DishId, formatShekels } from "@sharons-kitchen/shared";
 import {
   Table,
   Thead,
@@ -163,7 +163,7 @@ export function InventoryTable({
                   {dish.name}
                 </Td>
                 <Td textAlign="center" color="gray.800">
-                  ₪{dish.price}
+                  {formatShekels(dish.priceAgorot)}
                 </Td>
                 <Td textAlign="center" color="gray.800">
                   {dish.quantity}

@@ -73,7 +73,7 @@ export function EditDishModal({ dish, isOpen, onClose }: EditDishModalProps) {
     if (dish) {
       reset({
         name: dish.name,
-        price: dish.price,
+        priceAgorot: dish.priceAgorot,
         quantity: dish.quantity,
         unitsPerBox: dish.unitsPerBox ?? undefined,
         description: dish.description ?? undefined,

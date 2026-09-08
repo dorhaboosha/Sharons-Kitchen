@@ -18,3 +18,4 @@ export type { GetDishesQueryData } from "./schemas/getDishesQuery";
 
 // Utils
 export { normalizeName } from "./utils/normalizeName";
+export { agorotToShekels, shekelsToAgorot, formatShekels } from "./utils/money";

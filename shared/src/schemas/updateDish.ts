@@ -7,10 +7,11 @@ export const UpdateDishSchema = z
       .min(1, "שם המנה לא יכול להיות ריק")
       .max(120, "שם המנה ארוך מדי (עד 120 תווים)")
       .optional(),
-    price: z
-      .number({ invalid_type_error: "המחיר חייב להיות מספר" })
-      .int("המחיר חייב להיות מספר שלם")
+    priceAgorot: z
+      .number({ invalid_type_error: "המחיר אינו תקין" })
+      .int("המחיר אינו תקין")
       .min(0, "המחיר לא יכול להיות שלילי")
+      .max(10_000_000, "המחיר גבוה מדי")
       .optional(),
     quantity: z
       .number({ invalid_type_error: "הכמות חייבת להיות מספר" })

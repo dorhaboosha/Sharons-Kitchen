@@ -10,7 +10,7 @@ datasource db {
 model Dish {
   id          Int       @id @default(autoincrement())
   name        String    @unique
-  price       Int
+  priceAgorot Int       @map("price_agorot")
   quantity    Int
   unitsPerBox Int?      @map("units_per_box")
   description String?
