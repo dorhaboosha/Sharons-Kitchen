@@ -21,10 +21,6 @@ export function getDishes(params: GetDishesQueryData = {}): Promise<Dish[]> {
   return apiFetch<Dish[]>(`/api/dishes${buildQuery(params)}`);
 }
 
-export function getDishById(id: DishId): Promise<Dish> {
-  return apiFetch<Dish>(`/api/dishes/${id}`);
-}
-
 export function createDish(input: CreateDishInput): Promise<Dish> {
   return apiFetch<Dish>("/api/dishes", {
     method: "POST",
