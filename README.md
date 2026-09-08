@@ -66,10 +66,13 @@ cp .env.example .env
 npm install
 
 # 4. Run database migrations
-cd backend && npx prisma migrate dev --name init
+cd backend && npx prisma migrate dev
 
-# 5. Start frontend + backend together
-npm run dev
+# 5. Create the first operator account (interactive prompt)
+npm run create-user
+
+# 6. Start frontend + backend together
+cd .. && npm run dev
 ```
 
 | Service      | URL                              |
@@ -99,47 +102,66 @@ docker build -f backend/Dockerfile -t sharons-kitchen-backend .
 
 **Environment variables required:**
 
-- Backend: `DATABASE_URL`, `FRONTEND_URL`, `API_ACCESS_TOKEN`, `NODE_ENV=production`
+- Backend: `DATABASE_URL`, `FRONTEND_URL`, `NODE_ENV=production`
 - Frontend: `VITE_API_URL`, `NPM_CONFIG_PRODUCTION=false`
 
-The backend image sets `NODE_ENV=production` and installs only production
+There is no API token to set — authentication is per-user (see below). The
+backend image sets `NODE_ENV=production` and installs only production
 dependencies, so the old `NPM_CONFIG_PRODUCTION=false` workaround is no longer
 needed for it. The `prisma` CLI is a runtime dependency (used by
 `migrate deploy`). For a multi-instance deploy, move the migrate step to a
 Render pre-deploy command so instances don't race.
 
 The backend validates its environment on startup and exits with a clear message
-if `DATABASE_URL`, `FRONTEND_URL`, or `API_ACCESS_TOKEN` is missing/invalid in
-production. `FRONTEND_URL` must be the exact browser origin (scheme + host, no
-trailing slash). Generate `API_ACCESS_TOKEN` with e.g. `openssl rand -base64 32`.
+if `DATABASE_URL` or `FRONTEND_URL` is missing/invalid in production.
+`FRONTEND_URL` must be the exact browser origin (scheme + host, no trailing
+slash).
+
+Create operator accounts against the production database with the shell of the
+backend service (or locally with its `DATABASE_URL`):
+
+```bash
+node dist/scripts/createUser.js
+# or non-interactively:
+CREATE_USER_EMAIL=you@example.com CREATE_USER_NAME="Your Name" \
+  CREATE_USER_PASSWORD='a-long-password' node dist/scripts/createUser.js
+```
 
 Every `git push` to `main` triggers an automatic redeploy of both services.
 
 ---
 
-## Authentication (interim)
+## Authentication
 
-The admin API is gated by a **single shared password**, not per-user accounts
-yet. The operator enters it once on the login screen; the frontend stores it in
-`localStorage` and sends it as `Authorization: Bearer <token>` on every request.
-The backend compares it (constant-time) against `API_ACCESS_TOKEN`.
+Per-user accounts with server-side sessions.
 
-- The password is **never** in the built frontend bundle — only in the backend
-  environment and each authorized browser.
-- `/api/health` stays open; everything else under `/api` requires the token.
-- In development, if `API_ACCESS_TOKEN` is unset the API runs unauthenticated
-  with a startup warning.
+- **Accounts** live in the `users` table. Passwords are stored only as an
+  argon2id hash. There is no public sign-up — create accounts with
+  `npm run create-user` (locally) or `node dist/scripts/createUser.js` (in the
+  deployed backend's shell). Set a user's `is_active` to `false` to disable it.
+- **Login** — `POST /api/auth/login` with `{ email, password }` returns an
+  opaque session token. The frontend keeps it in `localStorage` and sends it as
+  `Authorization: Bearer <token>`. Only the token's SHA-256 hash is stored in
+  the `sessions` table, so a leak of that table cannot be replayed.
+- **Sessions** last 30 days, sliding forward at most once a day while in use.
+  `POST /api/auth/logout` deletes the row — a real, immediate revocation.
+  Deleting a user's rows in `sessions` logs them out everywhere.
+- `/api/health` stays open; every other `/api` route requires a valid session.
+  `POST /api/auth/login` has its own tighter rate limit.
 
-This is a stopgap. Real per-user accounts with httpOnly-cookie sessions are on
-the Next Steps list below.
+Transport is a bearer token (not a cookie) so the two-origin Render setup — a
+static site and a separate API service — needs no shared parent domain or CSRF
+handling. Moving to httpOnly-cookie sessions is worthwhile once the app is
+served from a single registrable domain.
 
 ---
 
 ## Next Steps
 
-- [x] **Login gate (interim)** — shared-password bearer credential on the whole API (see "Authentication" above)
-- [ ] **Real authentication** — per-user accounts, hashed passwords, httpOnly-cookie sessions, logout
-- [ ] **Sign up page** — allow new admin accounts to be created
+- [x] **Login gate (interim)** — shared-password bearer credential on the whole API
+- [x] **Real authentication** — per-user accounts, argon2id-hashed passwords, revocable server-side sessions, logout (see "Authentication" above)
+- [ ] **Sign up page** — self-serve / invite-based account creation (accounts are CLI-only for now)
+- [ ] **httpOnly-cookie sessions** — once the app is served from a single registrable domain
 - [ ] **Customers area** — a separate customer-facing section for browsing the menu
 - [ ] **New dish ideas page** — AI-assisted page for generating creative new dish ideas based on existing inventory
 - [ ] **Sales management** — add and track individual sales, view sales history
