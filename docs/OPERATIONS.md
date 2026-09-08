@@ -179,17 +179,19 @@ A backup you have never restored is not a backup.
 
 ```bash
 # spin up a throwaway local postgres, bound to loopback only, random password
-PW=$(openssl rand -hex 16)
-docker run --rm -d --name sk-restore-test -e POSTGRES_PASSWORD="$PW" \
+export PGPASSWORD=$(openssl rand -hex 16)
+docker run --rm -d --name sk-restore-test -e POSTGRES_PASSWORD="$PGPASSWORD" \
   -e POSTGRES_DB=sk -p 127.0.0.1:5544:5432 postgres:16
 sleep 5
-URL="postgresql://postgres:$PW@localhost:5544/sk"
+# credential-free URL — pg_restore reads the password from PGPASSWORD
 pg_restore --clean --if-exists --no-owner --no-privileges \
-  --dbname "$URL" sk-YYYYMMDD-HHMM.dump
-# point the app at it and click around
-DATABASE_URL="$URL" npm run dev --workspace=backend
+  --dbname "postgresql://postgres@localhost:5544/sk" sk-YYYYMMDD-HHMM.dump
+# point the app at it and click around (the app takes one DATABASE_URL)
+export DATABASE_URL="postgresql://postgres:$PGPASSWORD@localhost:5544/sk"
+npm run dev --workspace=backend
 # cleanup
 docker rm -f sk-restore-test
+unset PGPASSWORD DATABASE_URL
 ```
 
 Note how long it took and whether the row counts look right.
@@ -259,7 +261,11 @@ Sessions otherwise last 30 days, sliding forward while in use.
 
 - **Health check:** `GET /api/health` — open, no auth, returns
   `{"success":true,"data":{"status":"ok"}}`. Set this as the backend service's
-  **Health Check Path** in Render so a wedged instance gets restarted.
+  **Health Check Path** in Render so a wedged instance gets restarted. It is
+  **liveness only** — the process is up and Express is answering. It does **not**
+  touch the database, so a green health check does not rule out a DB outage
+  (that would show as failing API calls). Add a bounded DB-readiness check here
+  if you ever need one.
 
 ### Worth adding (not wired yet)
 
