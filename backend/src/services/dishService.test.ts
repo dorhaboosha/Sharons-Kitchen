@@ -38,6 +38,7 @@ type DishRow = {
   unitsPerBox: number | null;
   description: string | null;
   isActive: boolean;
+  deletedAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -51,6 +52,7 @@ function makeDish(overrides: Partial<DishRow> = {}): DishRow {
     unitsPerBox: null,
     description: null,
     isActive: true,
+    deletedAt: null,
     createdAt: new Date("2026-01-01T00:00:00Z"),
     updatedAt: new Date("2026-01-01T00:00:00Z"),
     ...overrides,
@@ -144,13 +146,37 @@ describe("updateDish", () => {
     expect(update).not.toHaveBeenCalled();
   });
 
-  it("allows restoring an inactive dish (isActive: true)", async () => {
+  it("stamps deletedAt when soft-deleting (isActive: false)", async () => {
+    findUnique.mockResolvedValue(resolve(makeDish({ isActive: true })));
+    update.mockResolvedValue(resolve(makeDish({ isActive: false })));
+
+    await updateDish(1, { isActive: false });
+
+    const arg = update.mock.calls[0][0] as { data: { isActive: boolean; deletedAt: Date } };
+    expect(arg.data.isActive).toBe(false);
+    expect(arg.data.deletedAt).toBeInstanceOf(Date);
+  });
+
+  it("clears deletedAt when restoring an inactive dish (isActive: true)", async () => {
     findUnique.mockResolvedValue(resolve(makeDish({ isActive: false })));
     update.mockResolvedValue(resolve(makeDish({ isActive: true })));
 
     await updateDish(1, { isActive: true });
 
-    expect(update).toHaveBeenCalledWith({ where: { id: 1 }, data: { isActive: true } });
+    expect(update).toHaveBeenCalledWith({
+      where: { id: 1 },
+      data: { isActive: true, deletedAt: null },
+    });
+  });
+
+  it("does not touch deletedAt on a plain field edit", async () => {
+    findUnique.mockResolvedValue(resolve(makeDish()));
+    update.mockResolvedValue(resolve(makeDish({ priceAgorot: 900 })));
+
+    await updateDish(1, { priceAgorot: 900 });
+
+    const arg = update.mock.calls[0][0] as { data: Record<string, unknown> };
+    expect("deletedAt" in arg.data).toBe(false);
   });
 
   it("throws CONFLICT when the new name belongs to a different dish", async () => {

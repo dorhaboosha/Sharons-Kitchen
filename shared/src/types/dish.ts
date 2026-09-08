@@ -11,6 +11,8 @@ export interface Dish {
   unitsPerBox: number | null;
   description: string | null;
   isActive: boolean;
+  /** When the dish was soft-deleted (ISO string); null while active. */
+  deletedAt: string | null;
   createdAt: string;
   updatedAt: string;
 }

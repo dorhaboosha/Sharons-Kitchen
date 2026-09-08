@@ -80,6 +80,13 @@ export async function updateDish(id: number, input: UpdateDishInput) {
 
   const data: Prisma.DishUpdateInput = { ...input };
 
+  // Keep deletedAt in step with the active/inactive transition.
+  if (input.isActive === false) {
+    data.deletedAt = new Date();
+  } else if (input.isActive === true) {
+    data.deletedAt = null;
+  }
+
   if (input.name !== undefined) {
     const name = normalizeName(input.name);
     const conflict = await prisma.dish.findUnique({ where: { name } });
