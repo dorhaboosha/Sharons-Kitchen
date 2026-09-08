@@ -66,11 +66,28 @@ export function AdjustStockModal({ dish, isOpen, onClose }: AdjustStockModalProp
       const delta = direction === "add" ? amount : -amount;
       return adjustStock(dish!.id, { delta });
     },
+    // Optimistic: bump the quantity in every cached list right away so the
+    // table reacts instantly. onSettled refetches the server truth (which also
+    // fixes ordering when sorting by quantity); onError rolls back.
+    onMutate: async ({ direction, amount }: AdjustStockFormData) => {
+      const delta = direction === "add" ? amount : -amount;
+      await queryClient.cancelQueries({ queryKey: [DISHES_QUERY_KEY] });
+      const snapshot = queryClient.getQueriesData<Dish[]>({ queryKey: [DISHES_QUERY_KEY] });
+
+      queryClient.setQueriesData<Dish[]>({ queryKey: [DISHES_QUERY_KEY] }, (list) =>
+        list?.map((d) =>
+          d.id === dish!.id && d.quantity + delta >= 0 ? { ...d, quantity: d.quantity + delta } : d,
+        ),
+      );
+
+      return { snapshot };
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [DISHES_QUERY_KEY] });
       handleClose();
     },
-    onError: (err: unknown) => {
+    onError: (err: unknown, _vars, context) => {
+      context?.snapshot?.forEach(([key, data]) => queryClient.setQueryData(key, data));
+
       if (err instanceof ApiClientError && err.code === "VALIDATION_ERROR") {
         setError("amount", { message: "הכמות להפחתה גדולה מהמלאי הקיים" });
       } else {
@@ -83,6 +100,9 @@ export function AdjustStockModal({ dish, isOpen, onClose }: AdjustStockModalProp
           position: "top",
         });
       }
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: [DISHES_QUERY_KEY] });
     },
   });
 
