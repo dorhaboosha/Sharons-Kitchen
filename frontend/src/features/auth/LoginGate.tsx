@@ -19,22 +19,23 @@ import logo from "../../assets/logo.png";
 
 export function LoginGate() {
   const { login } = useAuth();
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!password || submitting) return;
+    if (!email || !password || submitting) return;
 
     setSubmitting(true);
     setError(null);
     try {
-      await login(password);
+      await login(email.trim(), password);
     } catch (err) {
       setError(
         err instanceof ApiClientError && err.code === "UNAUTHORIZED"
-          ? "סיסמה שגויה"
+          ? "אימייל או סיסמה שגויים"
           : getErrorMessageFromError(err),
       );
       setPassword("");
@@ -60,18 +61,36 @@ export function LoginGate() {
             המטבח של שרון
           </Heading>
           <Text fontSize="sm" color="#2C1810">
-            נדרשת סיסמה כדי להיכנס לניהול המלאי
+            התחברות לניהול המלאי
           </Text>
         </VStack>
 
         <Box as="form" onSubmit={handleSubmit} p={6}>
           <FormControl isInvalid={Boolean(error)}>
+            <FormLabel color="gray.700">אימייל</FormLabel>
+            <Input
+              type="email"
+              dir="ltr"
+              textAlign="right"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              autoFocus
+              autoComplete="username"
+              bg="white"
+              color="gray.800"
+              borderColor="gray.500"
+              borderWidth="2px"
+              _hover={{ borderColor: "gray.700" }}
+              _focusVisible={{ borderColor: "gray.700", boxShadow: "none" }}
+            />
+          </FormControl>
+
+          <FormControl isInvalid={Boolean(error)} mt={4}>
             <FormLabel color="gray.700">סיסמה</FormLabel>
             <Input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              autoFocus
               autoComplete="current-password"
               bg="white"
               color="gray.800"
@@ -89,7 +108,7 @@ export function LoginGate() {
             w="full"
             mt={5}
             isLoading={submitting}
-            isDisabled={!password}
+            isDisabled={!email || !password}
           >
             כניסה
           </Button>

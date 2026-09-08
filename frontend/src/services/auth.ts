@@ -1,11 +1,12 @@
 /**
- * Storage for the interim shared API credential.
+ * Client-side storage for the session token.
  *
- * The password the operator types is kept in localStorage and sent as a bearer
- * token on every request. It never ships in the built bundle. This is a stopgap
- * until real per-user sessions exist (see the project plan).
+ * `POST /api/auth/login` returns an opaque per-user session token; it is kept
+ * in localStorage and sent as `Authorization: Bearer <token>` on every request.
+ * The token is server-side revocable (logout, or disabling the account), and
+ * never ships in the built bundle.
  */
-const STORAGE_KEY = "sk_api_token";
+const STORAGE_KEY = "sk_session_token";
 
 let inMemoryToken: string | null = readStored();
 

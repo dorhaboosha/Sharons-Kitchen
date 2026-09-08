@@ -7,6 +7,8 @@ import {
   Button,
   Flex,
   Heading,
+  HStack,
+  Text,
   useDisclosure,
 } from "@chakra-ui/react";
 import { Dish, DishId, GetDishesQueryData } from "@sharons-kitchen/shared";
@@ -25,7 +27,7 @@ import { PermanentDeleteConfirmDialog } from "../features/inventory/components/P
 import { SortValue } from "../features/inventory/components/SortControls";
 
 export function InventoryPage() {
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<GetDishesQueryData["filter"]>("all");
   const [sort, setSort] = useState<SortValue>("");
@@ -128,16 +130,16 @@ export function InventoryPage() {
         <Heading size="2xl" textAlign="center" flex="1">
           ניהול מלאי
         </Heading>
-        <Button
-          size="sm"
-          variant="ghost"
-          colorScheme="brand"
-          onClick={logout}
-          position="absolute"
-          insetInlineEnd={0}
-        >
-          יציאה
-        </Button>
+        <HStack spacing={3} position="absolute" insetInlineEnd={0}>
+          {user && (
+            <Text fontSize="sm" color="gray.600" display={{ base: "none", sm: "block" }}>
+              {user.displayName}
+            </Text>
+          )}
+          <Button size="sm" variant="ghost" colorScheme="brand" onClick={() => void logout()}>
+            יציאה
+          </Button>
+        </HStack>
       </Flex>
 
       <InventoryToolbar
