@@ -14,9 +14,11 @@
     "test:watch": "vitest",
     "migrate": "dotenv -e ../.env -- prisma migrate dev",
     "migrate:deploy": "dotenv -e ../.env -- prisma migrate deploy",
-    "prisma:studio": "dotenv -e ../.env -- prisma studio"
+    "prisma:studio": "dotenv -e ../.env -- prisma studio",
+    "create-user": "dotenv -e ../.env -- ts-node src/scripts/createUser.ts"
   },
   "dependencies": {
+    "@node-rs/argon2": "^2.2.0",
     "@prisma/client": "^6.6.0",
     "@sharons-kitchen/shared": "*",
     "compression": "^1.8.0",
@@ -32,9 +34,9 @@
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.6",
     "@types/node": "^22.0.0",
+    "dotenv-cli": "^8.0.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.0",
-    "dotenv-cli": "^8.0.0",
     "vitest": "^3.2.4"
   }
 }

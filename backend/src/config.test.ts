@@ -6,7 +6,6 @@ const prodBase = {
   ...base,
   NODE_ENV: "production",
   FRONTEND_URL: "https://sharons-kitchen-frontend.onrender.com",
-  API_ACCESS_TOKEN: "a-sufficiently-long-random-token",
 };
 
 describe("parseEnv", () => {
@@ -16,7 +15,6 @@ describe("parseEnv", () => {
       NODE_ENV: "development",
       PORT: 3000,
       frontendUrl: "http://localhost:5173",
-      apiAccessToken: undefined,
       isProduction: false,
     });
   });
@@ -26,26 +24,13 @@ describe("parseEnv", () => {
   });
 
   it("throws in production when FRONTEND_URL is missing", () => {
-    expect(() =>
-      parseEnv({ ...base, NODE_ENV: "production", API_ACCESS_TOKEN: prodBase.API_ACCESS_TOKEN }),
-    ).toThrow(/FRONTEND_URL/);
-  });
-
-  it("throws in production when API_ACCESS_TOKEN is missing", () => {
-    expect(() =>
-      parseEnv({ ...base, NODE_ENV: "production", FRONTEND_URL: prodBase.FRONTEND_URL }),
-    ).toThrow(/API_ACCESS_TOKEN/);
-  });
-
-  it("rejects an API_ACCESS_TOKEN shorter than 16 characters", () => {
-    expect(() => parseEnv({ ...prodBase, API_ACCESS_TOKEN: "short" })).toThrow(/API_ACCESS_TOKEN/);
+    expect(() => parseEnv({ ...base, NODE_ENV: "production" })).toThrow(/FRONTEND_URL/);
   });
 
   it("accepts a valid production environment", () => {
     const cfg = parseEnv({ ...prodBase });
     expect(cfg.isProduction).toBe(true);
     expect(cfg.frontendUrl).toBe("https://sharons-kitchen-frontend.onrender.com");
-    expect(cfg.apiAccessToken).toBe("a-sufficiently-long-random-token");
   });
 
   it("strips a trailing slash from FRONTEND_URL so it matches the browser origin", () => {

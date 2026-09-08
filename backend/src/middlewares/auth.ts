@@ -1,37 +1,33 @@
-import { timingSafeEqual } from "crypto";
-import type { RequestHandler } from "express";
+import type { Request, RequestHandler } from "express";
 import { AppError } from "../utils/AppError";
+import { resolveSession } from "../services/authService";
 
-/** Constant-time string comparison that also tolerates length mismatches. */
-function safeEqual(a: string, b: string): boolean {
-  const bufA = Buffer.from(a, "utf8");
-  const bufB = Buffer.from(b, "utf8");
-  if (bufA.length !== bufB.length) return false;
-  return timingSafeEqual(bufA, bufB);
+/** Pull the token out of an `Authorization: Bearer <token>` header, or null. */
+export function extractBearerToken(req: Request): string | null {
+  const match = /^Bearer\s+(.+)$/i.exec(req.get("authorization") ?? "");
+  return match ? match[1].trim() : null;
 }
 
 /**
- * Requires `Authorization: Bearer <token>` matching `expectedToken`.
- *
- * If `expectedToken` is undefined (only possible outside production — the
- * config layer requires it there) the guard is a no-op and logs a loud
- * warning at startup, so local dev stays frictionless.
+ * Gate: the request must carry a valid session token. On success `req.user` is
+ * populated; on failure the request is rejected with `UNAUTHORIZED` / 401 and
+ * the same message regardless of *why* it failed.
  */
-export function requireApiToken(expectedToken: string | undefined): RequestHandler {
-  if (!expectedToken) {
-    console.warn(
-      "\n⚠  API_ACCESS_TOKEN is not set — the API is running UNAUTHENTICATED.\n" +
-        "   Set API_ACCESS_TOKEN in the environment to require a credential.\n",
-    );
-    return (_req, _res, next) => next();
+export const requireUser: RequestHandler = (req, _res, next) => {
+  const token = extractBearerToken(req);
+  if (!token) {
+    next(new AppError("UNAUTHORIZED", 401, "נדרשת הזדהות"));
+    return;
   }
 
-  return (req, _res, next) => {
-    const match = /^Bearer\s+(.+)$/i.exec(req.get("authorization") ?? "");
-    if (!match || !safeEqual(match[1], expectedToken)) {
-      next(new AppError("UNAUTHORIZED", 401, "נדרשת הזדהות"));
-      return;
-    }
-    next();
-  };
-}
+  resolveSession(token)
+    .then((user) => {
+      if (!user) {
+        next(new AppError("UNAUTHORIZED", 401, "נדרשת הזדהות"));
+        return;
+      }
+      req.user = user;
+      next();
+    })
+    .catch(next);
+};

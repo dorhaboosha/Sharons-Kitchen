@@ -5,7 +5,7 @@ import compression from "compression";
 import rateLimit from "express-rate-limit";
 import { loadConfigOrExit } from "./config";
 import { errorHandler } from "./middlewares/errorHandler";
-import { requireApiToken } from "./middlewares/auth";
+import { requireUser } from "./middlewares/auth";
 import { sendError } from "./utils/response";
 import dishesRouter from "./routes/dishes";
 import authRouter from "./routes/auth";
@@ -46,16 +46,29 @@ const writeLimiter = rateLimit({
     sendError(res, 429, "RATE_LIMITED", "יותר מדי בקשות כתיבה, נסה שוב מאוחר יותר"),
 });
 
+// Tight brake on login specifically, to slow credential-stuffing.
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  skipSuccessfulRequests: true,
+  handler: (_req, res) =>
+    sendError(res, 429, "RATE_LIMITED", "יותר מדי ניסיונות התחברות, נסה שוב מאוחר יותר"),
+});
+
 // Health check stays open so platform probes are unaffected.
 app.get("/api/health", (_req, res) => {
   res.json({ success: true, data: { status: "ok" } });
 });
 
-// Interim shared-credential gate on everything else under /api.
-const requireAuth = requireApiToken(config.apiAccessToken);
+// Auth endpoints: login is public (it's the way in) but throttled; logout and
+// /me guard themselves inside the router.
+app.use("/api/auth/login", loginLimiter);
+app.use("/api/auth", apiLimiter, authRouter);
 
-app.use("/api/auth", apiLimiter, requireAuth, authRouter);
-app.use("/api/dishes", apiLimiter, writeLimiter, requireAuth, dishesRouter);
+// Everything else requires a valid session.
+app.use("/api/dishes", apiLimiter, writeLimiter, requireUser, dishesRouter);
 
 app.use(errorHandler);
 

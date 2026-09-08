@@ -1,9 +1,15 @@
-import { describe, it, expect, vi, afterEach } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import type { Request, Response } from "express";
-import { requireApiToken } from "./auth";
+
+vi.mock("../services/authService", () => ({
+  resolveSession: vi.fn(),
+}));
+
+import { requireUser, extractBearerToken } from "./auth";
+import { resolveSession } from "../services/authService";
 import { AppError } from "../utils/AppError";
 
-const TOKEN = "s3cret-token-of-decent-length";
+const resolveSessionMock = vi.mocked(resolveSession);
 
 function mockReq(authHeader?: string): Request {
   const get = (name: string) => (name.toLowerCase() === "authorization" ? authHeader : undefined);
@@ -11,47 +17,82 @@ function mockReq(authHeader?: string): Request {
 }
 
 const noopRes = {} as unknown as Response;
+const flush = () => new Promise((resolve) => setImmediate(resolve));
 
-afterEach(() => {
-  vi.restoreAllMocks();
+beforeEach(() => {
+  vi.clearAllMocks();
 });
 
-describe("requireApiToken", () => {
-  it("is a no-op (and warns) when no token is configured", () => {
-    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
-    const next = vi.fn();
-
-    requireApiToken(undefined)(mockReq(), noopRes, next);
-
-    expect(next.mock.calls[0][0]).toBeUndefined();
-    expect(warn).toHaveBeenCalled();
+describe("extractBearerToken", () => {
+  it.each([
+    ["Bearer abc.def", "abc.def"],
+    ["bearer abc.def", "abc.def"],
+    ["Bearer   padded  ", "padded"],
+  ])("pulls the token from %j", (header, expected) => {
+    expect(extractBearerToken(mockReq(header))).toBe(expected);
   });
 
-  it("calls next() with no error for a valid Bearer token", () => {
-    const next = vi.fn();
-    requireApiToken(TOKEN)(mockReq(`Bearer ${TOKEN}`), noopRes, next);
-    expect(next.mock.calls[0][0]).toBeUndefined();
+  it.each([[undefined], [""], ["abc.def"], ["Basic abc.def"]])("returns null for %j", (header) => {
+    expect(extractBearerToken(mockReq(header as string | undefined))).toBeNull();
   });
+});
 
-  it("accepts a lowercase 'bearer' scheme", () => {
+describe("requireUser", () => {
+  it("populates req.user and calls next() with no error for a valid token", async () => {
+    const user = { id: 1, email: "a@b.com", displayName: "שרון" };
+    resolveSessionMock.mockResolvedValue(user);
+    const req = mockReq("Bearer good-token");
     const next = vi.fn();
-    requireApiToken(TOKEN)(mockReq(`bearer ${TOKEN}`), noopRes, next);
+
+    requireUser(req, noopRes, next);
+    await flush();
+
+    expect(resolveSessionMock).toHaveBeenCalledWith("good-token");
+    expect(req.user).toEqual(user);
+    expect(next).toHaveBeenCalledTimes(1);
     expect(next.mock.calls[0][0]).toBeUndefined();
   });
 
   it.each([
     ["missing header", undefined],
     ["empty header", ""],
-    ["wrong token", "Bearer totally-the-wrong-value"],
-    ["token without a scheme", TOKEN],
-    ["basic scheme", `Basic ${TOKEN}`],
-    ["prefix of the real token", `Bearer ${TOKEN.slice(0, -1)}`],
-  ])("rejects %s with UNAUTHORIZED / 401", (_label, header) => {
-    const next = vi.fn();
-    requireApiToken(TOKEN)(mockReq(header as string | undefined), noopRes, next);
+    ["no scheme", "just-a-token"],
+    ["basic scheme", "Basic just-a-token"],
+  ])(
+    "rejects %s with UNAUTHORIZED / 401 without hitting the session store",
+    async (_label, header) => {
+      const next = vi.fn();
 
-    const err = next.mock.calls[0][0];
-    expect(err).toBeInstanceOf(AppError);
-    expect(err).toMatchObject({ code: "UNAUTHORIZED", statusCode: 401 });
+      requireUser(mockReq(header as string | undefined), noopRes, next);
+      await flush();
+
+      expect(resolveSessionMock).not.toHaveBeenCalled();
+      const err = next.mock.calls[0][0];
+      expect(err).toBeInstanceOf(AppError);
+      expect(err).toMatchObject({ code: "UNAUTHORIZED", statusCode: 401 });
+    },
+  );
+
+  it("rejects a well-formed but unknown/expired token with UNAUTHORIZED / 401", async () => {
+    resolveSessionMock.mockResolvedValue(null);
+    const req = mockReq("Bearer stale-token");
+    const next = vi.fn();
+
+    requireUser(req, noopRes, next);
+    await flush();
+
+    expect(req.user).toBeUndefined();
+    expect(next.mock.calls[0][0]).toMatchObject({ code: "UNAUTHORIZED", statusCode: 401 });
+  });
+
+  it("forwards an unexpected store error to next()", async () => {
+    const boom = new Error("db down");
+    resolveSessionMock.mockRejectedValue(boom);
+    const next = vi.fn();
+
+    requireUser(mockReq("Bearer whatever"), noopRes, next);
+    await flush();
+
+    expect(next).toHaveBeenCalledWith(boom);
   });
 });
