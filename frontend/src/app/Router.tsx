@@ -3,7 +3,7 @@ import { Box, Center, Spinner } from "@chakra-ui/react";
 import { InventoryPage } from "../pages/InventoryPage";
 import { LoginGate } from "../features/auth/LoginGate";
 import { useAuth } from "./AuthProvider";
-import bgTheme from "../assets/background_theme.png";
+import bgTheme from "../assets/background_theme.webp";
 
 const BG_OVERLAY = `linear-gradient(rgba(255,255,255,0.35), rgba(255,255,255,0.35)), url(${bgTheme})`;
 

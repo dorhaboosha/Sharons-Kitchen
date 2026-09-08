@@ -15,5 +15,7 @@ backend/prisma/migrations/
 
 # Assets
 *.png
+*.webp
+*.avif
 *.svg
 *.ico
