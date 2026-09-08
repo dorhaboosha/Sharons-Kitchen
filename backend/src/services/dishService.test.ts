@@ -4,9 +4,11 @@ vi.mock("../prisma/client", () => ({
   prisma: {
     dish: {
       findUnique: vi.fn(),
+      findUniqueOrThrow: vi.fn(),
       findMany: vi.fn(),
       create: vi.fn(),
       update: vi.fn(),
+      updateMany: vi.fn(),
       deleteMany: vi.fn(),
     },
   },
@@ -22,8 +24,10 @@ import {
 } from "./dishService";
 
 const findUnique = vi.mocked(prisma.dish.findUnique);
+const findUniqueOrThrow = vi.mocked(prisma.dish.findUniqueOrThrow);
 const create = vi.mocked(prisma.dish.create);
 const update = vi.mocked(prisma.dish.update);
+const updateMany = vi.mocked(prisma.dish.updateMany);
 const deleteMany = vi.mocked(prisma.dish.deleteMany);
 
 type DishRow = {
@@ -184,51 +188,64 @@ describe("updateDish", () => {
 });
 
 describe("adjustStock", () => {
-  it("throws NOT_FOUND when the dish is missing", async () => {
+  it("applies the delta in one conditional UPDATE and returns the fresh row", async () => {
+    updateMany.mockResolvedValue(resolve({ count: 1 }));
+    const updated = makeDish({ quantity: 12 });
+    findUniqueOrThrow.mockResolvedValue(resolve(updated));
+
+    const result = await adjustStock(1, 7);
+
+    expect(updateMany).toHaveBeenCalledWith({
+      where: { id: 1, isActive: true, quantity: { gte: -7 } },
+      data: { quantity: { increment: 7 } },
+    });
+    expect(update).not.toHaveBeenCalled();
+    expect(result).toEqual(updated);
+  });
+
+  it("guards the zero floor via `quantity >= -delta` when subtracting", async () => {
+    updateMany.mockResolvedValue(resolve({ count: 1 }));
+    findUniqueOrThrow.mockResolvedValue(resolve(makeDish({ quantity: 0 })));
+
+    await adjustStock(1, -3);
+
+    expect(updateMany).toHaveBeenCalledWith({
+      where: { id: 1, isActive: true, quantity: { gte: 3 } },
+      data: { quantity: { increment: -3 } },
+    });
+  });
+
+  it("throws NOT_FOUND when nothing matched and the dish does not exist", async () => {
+    updateMany.mockResolvedValue(resolve({ count: 0 }));
     findUnique.mockResolvedValue(resolve(null));
 
     await expect(adjustStock(1, 3)).rejects.toMatchObject({
       code: "NOT_FOUND",
       statusCode: 404,
     });
+    expect(findUniqueOrThrow).not.toHaveBeenCalled();
   });
 
-  it("refuses to adjust stock on an inactive dish", async () => {
+  it("throws VALIDATION_ERROR for an inactive dish", async () => {
+    updateMany.mockResolvedValue(resolve({ count: 0 }));
     findUnique.mockResolvedValue(resolve(makeDish({ isActive: false })));
 
     await expect(adjustStock(1, 3)).rejects.toMatchObject({
       code: "VALIDATION_ERROR",
       statusCode: 400,
+      message: "לא ניתן לעדכן מלאי של מנה לא פעילה",
     });
-    expect(update).not.toHaveBeenCalled();
   });
 
-  it("refuses to let quantity go below zero", async () => {
-    findUnique.mockResolvedValue(resolve(makeDish({ quantity: 2 })));
+  it("throws the below-zero VALIDATION_ERROR when the dish is active but stock is too low", async () => {
+    updateMany.mockResolvedValue(resolve({ count: 0 }));
+    findUnique.mockResolvedValue(resolve(makeDish({ isActive: true, quantity: 2 })));
 
     await expect(adjustStock(1, -3)).rejects.toMatchObject({
       code: "VALIDATION_ERROR",
       statusCode: 400,
+      message: "לא ניתן להפחית מתחת ל-0",
     });
-    expect(update).not.toHaveBeenCalled();
-  });
-
-  it("allows an adjustment that lands exactly on zero", async () => {
-    findUnique.mockResolvedValue(resolve(makeDish({ quantity: 3 })));
-    update.mockResolvedValue(resolve(makeDish({ quantity: 0 })));
-
-    await adjustStock(1, -3);
-
-    expect(update).toHaveBeenCalledWith({ where: { id: 1 }, data: { quantity: 0 } });
-  });
-
-  it("adds the delta to the current quantity", async () => {
-    findUnique.mockResolvedValue(resolve(makeDish({ quantity: 5 })));
-    update.mockResolvedValue(resolve(makeDish({ quantity: 12 })));
-
-    await adjustStock(1, 7);
-
-    expect(update).toHaveBeenCalledWith({ where: { id: 1 }, data: { quantity: 12 } });
   });
 });
 

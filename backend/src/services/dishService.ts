@@ -93,24 +93,29 @@ export async function updateDish(id: number, input: UpdateDishInput) {
 }
 
 export async function adjustStock(id: number, delta: number) {
-  const dish = await prisma.dish.findUnique({ where: { id } });
-  if (!dish) {
-    throw new AppError("NOT_FOUND", 404, "המנה לא נמצאה");
-  }
+  // Atomic: the row changes only if it exists, is active, and the result stays
+  // >= 0 — all decided inside the single UPDATE. Concurrent adjustments can't
+  // lose an update or drive stock negative. `quantity >= -delta` is equivalent
+  // to `quantity + delta >= 0` for both signs of delta.
+  const { count } = await prisma.dish.updateMany({
+    where: { id, isActive: true, quantity: { gte: -delta } },
+    data: { quantity: { increment: delta } },
+  });
 
-  if (!dish.isActive) {
-    throw new AppError("VALIDATION_ERROR", 400, "לא ניתן לעדכן מלאי של מנה לא פעילה");
-  }
-
-  const newQuantity = dish.quantity + delta;
-  if (newQuantity < 0) {
+  if (count === 0) {
+    // Nothing matched — report the most specific reason. A benign race here
+    // could mislabel the reason, but the mutation itself already didn't happen.
+    const dish = await prisma.dish.findUnique({ where: { id } });
+    if (!dish) {
+      throw new AppError("NOT_FOUND", 404, "המנה לא נמצאה");
+    }
+    if (!dish.isActive) {
+      throw new AppError("VALIDATION_ERROR", 400, "לא ניתן לעדכן מלאי של מנה לא פעילה");
+    }
     throw new AppError("VALIDATION_ERROR", 400, "לא ניתן להפחית מתחת ל-0");
   }
 
-  return prisma.dish.update({
-    where: { id },
-    data: { quantity: newQuantity },
-  });
+  return prisma.dish.findUniqueOrThrow({ where: { id } });
 }
 
 export async function deleteDishPermanently(id: number) {
