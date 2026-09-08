@@ -14,6 +14,7 @@ export function SearchBar({ value, onChange }: SearchBarProps) {
       <Input
         value={value}
         onChange={(e) => onChange(e.target.value)}
+        maxLength={100}
         placeholder="חיפוש לפי שם מנה..."
         bg="white"
         color="gray.800"

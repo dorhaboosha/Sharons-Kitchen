@@ -1,7 +1,17 @@
 import { useState } from "react";
-import { Box, Button, Flex, Heading, useDisclosure } from "@chakra-ui/react";
+import {
+  Alert,
+  AlertDescription,
+  AlertIcon,
+  Box,
+  Button,
+  Flex,
+  Heading,
+  useDisclosure,
+} from "@chakra-ui/react";
 import { Dish, DishId, GetDishesQueryData } from "@sharons-kitchen/shared";
 import { useAuth } from "../app/AuthProvider";
+import { useDebouncedValue } from "../hooks/useDebouncedValue";
 import { useInventory } from "../features/inventory/hooks/useInventory";
 import { InventoryToolbar } from "../features/inventory/components/InventoryToolbar";
 import { InventoryTable } from "../features/inventory/components/InventoryTable";
@@ -20,12 +30,20 @@ export function InventoryPage() {
   const [filter, setFilter] = useState<GetDishesQueryData["filter"]>("all");
   const [sort, setSort] = useState<SortValue>("");
 
+  // Only the settled search term hits the API — typing stays instant.
+  const debouncedSearch = useDebouncedValue(search, 300);
+
   // Split combined sort value ("name:asc") into separate API params before querying
   const [sortBy, sortOrder] = sort
     ? (sort.split(":") as [GetDishesQueryData["sortBy"], GetDishesQueryData["sortOrder"]])
     : [undefined, "asc" as const];
 
-  const { data: dishes = [], isLoading } = useInventory({ search, filter, sortBy, sortOrder });
+  const {
+    data: dishes = [],
+    isLoading,
+    isError,
+    refetch,
+  } = useInventory({ search: debouncedSearch, filter, sortBy, sortOrder });
 
   const hasActiveFilters =
     Boolean(search) || (filter !== undefined && filter !== "all") || Boolean(sort);
@@ -134,17 +152,29 @@ export function InventoryPage() {
 
       <StockLegend />
 
-      <InventoryTable
-        dishes={dishes}
-        isLoading={isLoading}
-        hasActiveFilters={hasActiveFilters}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-        onRestore={handleRestore}
-        onAdjustStock={handleAdjustStock}
-        onPermanentDelete={handlePermanentDelete}
-        onClearFilters={handleClearFilters}
-      />
+      {isError && (
+        <Alert status="error" borderRadius="md" mb={4} dir="rtl">
+          <AlertIcon />
+          <AlertDescription flex="1">לא ניתן לטעון את רשימת המנות.</AlertDescription>
+          <Button size="sm" colorScheme="red" variant="outline" onClick={() => refetch()}>
+            נסה שוב
+          </Button>
+        </Alert>
+      )}
+
+      {(!isError || dishes.length > 0) && (
+        <InventoryTable
+          dishes={dishes}
+          isLoading={isLoading}
+          hasActiveFilters={hasActiveFilters}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          onRestore={handleRestore}
+          onAdjustStock={handleAdjustStock}
+          onPermanentDelete={handlePermanentDelete}
+          onClearFilters={handleClearFilters}
+        />
+      )}
 
       <CreateDishModal isOpen={createModal.isOpen} onClose={createModal.onClose} />
 
