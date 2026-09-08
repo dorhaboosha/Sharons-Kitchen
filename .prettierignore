@@ -1,0 +1,21 @@
+# Build outputs
+dist/
+build/
+coverage/
+
+# Dependencies
+node_modules/
+
+# Generated
+package-lock.json
+*.tsbuildinfo
+
+# Prisma migrations (generated SQL)
+backend/prisma/migrations/
+
+# Assets
+*.png
+*.webp
+*.avif
+*.svg
+*.ico

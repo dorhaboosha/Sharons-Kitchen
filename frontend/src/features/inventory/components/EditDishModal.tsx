@@ -1,6 +1,19 @@
 import { useEffect } from "react";
-import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, ModalCloseButton, Button, VStack, FormControl, FormLabel, 
-  Switch, useToast } from "@chakra-ui/react";
+import {
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  ModalCloseButton,
+  Button,
+  VStack,
+  FormControl,
+  FormLabel,
+  Switch,
+  useToast,
+} from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -21,8 +34,16 @@ export function EditDishModal({ dish, isOpen, onClose }: EditDishModalProps) {
   const queryClient = useQueryClient();
   const toast = useToast();
 
-  const { register, handleSubmit, reset, watch, setValue, setError, control, formState: { errors } } =
-    useForm<UpdateDishData>({ resolver: zodResolver(UpdateDishSchema) });
+  const {
+    register,
+    handleSubmit,
+    reset,
+    watch,
+    setValue,
+    setError,
+    control,
+    formState: { errors },
+  } = useForm<UpdateDishData>({ resolver: zodResolver(UpdateDishSchema) });
 
   const isActive = watch("isActive");
 
@@ -35,8 +56,7 @@ export function EditDishModal({ dish, isOpen, onClose }: EditDishModalProps) {
     onError: (err: unknown) => {
       if (err instanceof ApiClientError && err.code === "CONFLICT") {
         setError("name", { message: "כבר קיימת מנה בשם הזה" });
-      } 
-      else {
+      } else {
         toast({
           title: "שגיאה בשמירת המנה",
           description: "אירעה שגיאה, נסה שנית",
@@ -53,7 +73,7 @@ export function EditDishModal({ dish, isOpen, onClose }: EditDishModalProps) {
     if (dish) {
       reset({
         name: dish.name,
-        price: dish.price,
+        priceAgorot: dish.priceAgorot,
         quantity: dish.quantity,
         unitsPerBox: dish.unitsPerBox ?? undefined,
         description: dish.description ?? undefined,
@@ -72,11 +92,23 @@ export function EditDishModal({ dish, isOpen, onClose }: EditDishModalProps) {
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} closeOnOverlayClick={true} size={{ base: "md", md: "lg" }}>
+    <Modal
+      isOpen={isOpen}
+      onClose={handleClose}
+      closeOnOverlayClick={true}
+      size={{ base: "md", md: "lg" }}
+    >
       <ModalOverlay />
       <ModalContent dir="rtl" bg="brand.50" color="gray.800" borderRadius="xl" overflow="hidden">
-        <ModalHeader bg="brand.200" color="#2C1810" textAlign="center" fontSize="xl" fontWeight="bold"
-          borderBottom="2px solid" borderBottomColor="gray.400">
+        <ModalHeader
+          bg="brand.200"
+          color="#2C1810"
+          textAlign="center"
+          fontSize="xl"
+          fontWeight="bold"
+          borderBottom="2px solid"
+          borderBottomColor="gray.400"
+        >
           עריכת מנה ✏️
         </ModalHeader>
         <ModalCloseButton color="#2C1810" />
@@ -84,13 +116,24 @@ export function EditDishModal({ dish, isOpen, onClose }: EditDishModalProps) {
         <form onSubmit={handleSubmit(onSubmit)}>
           <ModalBody pt={3} pb={2}>
             <VStack spacing={3} align="stretch">
-              <DishFormFields register={register as unknown as UseFormRegister<CreateDishData>} errors={errors as FieldErrors<CreateDishData>} control={control as unknown as Control<CreateDishData>} />
+              <DishFormFields
+                register={register as unknown as UseFormRegister<CreateDishData>}
+                errors={errors as FieldErrors<CreateDishData>}
+                control={control as unknown as Control<CreateDishData>}
+              />
 
               <FormControl display="flex" alignItems="center" gap={3}>
-                <FormLabel mb={0} color="gray.700">מנה פעילה</FormLabel>
-                <Switch isChecked={isActive ?? true} onChange={(e) => setValue("isActive", e.target.checked)}
-                  sx={{".chakra-switch__track[data-checked]": { bg: "green.400" },
-                  ".chakra-switch__track:not([data-checked])": { bg: "red.400" } }} />
+                <FormLabel mb={0} color="gray.700">
+                  מנה פעילה
+                </FormLabel>
+                <Switch
+                  isChecked={isActive ?? true}
+                  onChange={(e) => setValue("isActive", e.target.checked)}
+                  sx={{
+                    ".chakra-switch__track[data-checked]": { bg: "green.400" },
+                    ".chakra-switch__track:not([data-checked])": { bg: "red.400" },
+                  }}
+                />
               </FormControl>
             </VStack>
           </ModalBody>

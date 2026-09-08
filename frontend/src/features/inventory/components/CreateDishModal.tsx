@@ -1,5 +1,15 @@
-import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter,
-  ModalCloseButton, Button, VStack, useToast } from "@chakra-ui/react";
+import {
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  ModalCloseButton,
+  Button,
+  VStack,
+  useToast,
+} from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -18,8 +28,17 @@ export function CreateDishModal({ isOpen, onClose }: CreateDishModalProps) {
   const queryClient = useQueryClient();
   const toast = useToast();
 
-  const { register, handleSubmit, reset, setError, control, formState: { errors } } =
-    useForm<CreateDishData>({ resolver: zodResolver(CreateDishSchema), defaultValues: { price: 1, quantity: 1 } });
+  const {
+    register,
+    handleSubmit,
+    reset,
+    setError,
+    control,
+    formState: { errors },
+  } = useForm<CreateDishData>({
+    resolver: zodResolver(CreateDishSchema),
+    defaultValues: { priceAgorot: 100, quantity: 1 },
+  });
 
   const mutation = useMutation({
     mutationFn: createDish,
@@ -53,12 +72,24 @@ export function CreateDishModal({ isOpen, onClose }: CreateDishModalProps) {
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} closeOnOverlayClick={true} size={{ base: "md", md: "lg" }}>
+    <Modal
+      isOpen={isOpen}
+      onClose={handleClose}
+      closeOnOverlayClick={true}
+      size={{ base: "md", md: "lg" }}
+    >
       <ModalOverlay />
       <ModalContent dir="rtl" bg="brand.50" color="gray.800" borderRadius="xl" overflow="hidden">
         {/* Header strip in logo blue with brown title text */}
-        <ModalHeader bg="brand.200" color="#2C1810" textAlign="center" fontSize="xl" fontWeight="bold" 
-          borderBottom="2px solid" borderBottomColor="gray.400">
+        <ModalHeader
+          bg="brand.200"
+          color="#2C1810"
+          textAlign="center"
+          fontSize="xl"
+          fontWeight="bold"
+          borderBottom="2px solid"
+          borderBottomColor="gray.400"
+        >
           הוספת מנה חדשה 🍽️
         </ModalHeader>
         <ModalCloseButton color="#2C1810" />

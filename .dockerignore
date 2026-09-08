@@ -1,0 +1,32 @@
+# The backend image only needs backend + shared sources and the manifests.
+**/node_modules
+**/dist
+**/build
+**/coverage
+**/.tsbuildinfo
+**/*.tsbuildinfo
+
+.git
+.github
+.vscode
+.cursor
+docs
+openspec
+
+# never bake secrets or local env into an image
+.env
+.env.*
+!.env.example
+
+# frontend is a separate (static) deploy
+frontend/src
+frontend/public
+frontend/index.html
+frontend/vite.config.ts
+frontend/tsconfig*.json
+
+# tests / tooling
+**/*.test.ts
+eslint.config.mjs
+.prettier*
+.editorconfig

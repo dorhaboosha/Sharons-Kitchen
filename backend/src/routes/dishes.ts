@@ -1,7 +1,19 @@
 import { Router } from "express";
 import { validate, validateQuery } from "../middlewares/validate";
-import { CreateDishSchema, UpdateDishSchema, AdjustStockSchema, GetDishesQuerySchema } from "@sharons-kitchen/shared";
-import { getDishesController, getDishByIdController, createDishController, updateDishController, adjustStockController, deleteDishController } from "../controllers/dishControllers";
+import {
+  CreateDishSchema,
+  UpdateDishSchema,
+  AdjustStockSchema,
+  GetDishesQuerySchema,
+} from "@sharons-kitchen/shared";
+import {
+  getDishesController,
+  getDishByIdController,
+  createDishController,
+  updateDishController,
+  adjustStockController,
+  deleteDishController,
+} from "../controllers/dishControllers";
 
 const router = Router();
 

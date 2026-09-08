@@ -1,7 +1,8 @@
 /** Input for creating a new dish. Name will be normalized by the backend before persistence. */
 export interface CreateDishInput {
   name: string;
-  price: number;
+  /** Price in agorot (1/100 shekel). */
+  priceAgorot: number;
   quantity: number;
   unitsPerBox?: number;
   description?: string;
@@ -14,7 +15,8 @@ export interface CreateDishInput {
  */
 export interface UpdateDishInput {
   name?: string;
-  price?: number;
+  /** Price in agorot (1/100 shekel). */
+  priceAgorot?: number;
   quantity?: number;
   unitsPerBox?: number | null;
   description?: string | null;

@@ -1,6 +1,19 @@
 import { useState } from "react";
-import { Box, Heading, useDisclosure } from "@chakra-ui/react";
+import {
+  Alert,
+  AlertDescription,
+  AlertIcon,
+  Box,
+  Button,
+  Flex,
+  Heading,
+  HStack,
+  Text,
+  useDisclosure,
+} from "@chakra-ui/react";
 import { Dish, DishId, GetDishesQueryData } from "@sharons-kitchen/shared";
+import { useAuth } from "../app/AuthProvider";
+import { useDebouncedValue } from "../hooks/useDebouncedValue";
 import { useInventory } from "../features/inventory/hooks/useInventory";
 import { InventoryToolbar } from "../features/inventory/components/InventoryToolbar";
 import { InventoryTable } from "../features/inventory/components/InventoryTable";
@@ -14,18 +27,28 @@ import { PermanentDeleteConfirmDialog } from "../features/inventory/components/P
 import { SortValue } from "../features/inventory/components/SortControls";
 
 export function InventoryPage() {
+  const { user, logout } = useAuth();
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<GetDishesQueryData["filter"]>("all");
   const [sort, setSort] = useState<SortValue>("");
+
+  // Only the settled search term hits the API — typing stays instant.
+  const debouncedSearch = useDebouncedValue(search, 300);
 
   // Split combined sort value ("name:asc") into separate API params before querying
   const [sortBy, sortOrder] = sort
     ? (sort.split(":") as [GetDishesQueryData["sortBy"], GetDishesQueryData["sortOrder"]])
     : [undefined, "asc" as const];
 
-  const { data: dishes = [], isLoading } = useInventory({ search, filter, sortBy, sortOrder });
+  const {
+    data: dishes = [],
+    isLoading,
+    isError,
+    refetch,
+  } = useInventory({ search: debouncedSearch, filter, sortBy, sortOrder });
 
-  const hasActiveFilters = Boolean(search) || (filter !== undefined && filter !== "all") || Boolean(sort);
+  const hasActiveFilters =
+    Boolean(search) || (filter !== undefined && filter !== "all") || Boolean(sort);
 
   function handleClearFilters() {
     setSearch("");
@@ -43,7 +66,10 @@ export function InventoryPage() {
   const [editingDish, setEditingDish] = useState<Dish | null>(null);
   const [deletingDish, setDeletingDish] = useState<{ id: DishId; name: string } | null>(null);
   const [restoringDish, setRestoringDish] = useState<{ id: DishId; name: string } | null>(null);
-  const [permanentlyDeletingDish, setPermanentlyDeletingDish] = useState<{ id: DishId; name: string } | null>(null);
+  const [permanentlyDeletingDish, setPermanentlyDeletingDish] = useState<{
+    id: DishId;
+    name: string;
+  } | null>(null);
   const [adjustingDish, setAdjustingDish] = useState<Dish | null>(null);
 
   function handleEdit(dish: Dish) {
@@ -100,29 +126,88 @@ export function InventoryPage() {
 
   return (
     <Box maxW="1200px" mx="auto" px={{ base: 3, md: 6 }} py={{ base: 4, md: 8 }} dir="rtl">
-      <Heading size="2xl" textAlign="center" mb={8}>
-        ניהול מלאי
-      </Heading>
+      <Flex align="center" mb={8} position="relative">
+        <Heading size="2xl" textAlign="center" flex="1">
+          ניהול מלאי
+        </Heading>
+        <HStack spacing={3} position="absolute" insetInlineEnd={0}>
+          {user && (
+            <Text fontSize="sm" color="gray.600" display={{ base: "none", sm: "block" }}>
+              {user.displayName}
+            </Text>
+          )}
+          <Button size="sm" variant="ghost" colorScheme="brand" onClick={() => void logout()}>
+            יציאה
+          </Button>
+        </HStack>
+      </Flex>
 
-      <InventoryToolbar search={search} onSearchChange={setSearch} filter={filter} onFilterChange={setFilter}
-        sort={sort} onSortChange={setSort}
-        onAddClick={createModal.onOpen} />
+      <InventoryToolbar
+        search={search}
+        onSearchChange={setSearch}
+        filter={filter}
+        onFilterChange={setFilter}
+        sort={sort}
+        onSortChange={setSort}
+        onAddClick={createModal.onOpen}
+      />
 
       <StockLegend />
 
-      <InventoryTable dishes={dishes} isLoading={isLoading} hasActiveFilters={hasActiveFilters} onEdit={handleEdit} onDelete={handleDelete} onRestore={handleRestore} onAdjustStock={handleAdjustStock} onPermanentDelete={handlePermanentDelete} onClearFilters={handleClearFilters} />
+      {isError && (
+        <Alert status="error" borderRadius="md" mb={4} dir="rtl">
+          <AlertIcon />
+          <AlertDescription flex="1">לא ניתן לטעון את רשימת המנות.</AlertDescription>
+          <Button size="sm" colorScheme="red" variant="outline" onClick={() => refetch()}>
+            נסה שוב
+          </Button>
+        </Alert>
+      )}
+
+      {(!isError || dishes.length > 0) && (
+        <InventoryTable
+          dishes={dishes}
+          isLoading={isLoading}
+          hasActiveFilters={hasActiveFilters}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          onRestore={handleRestore}
+          onAdjustStock={handleAdjustStock}
+          onPermanentDelete={handlePermanentDelete}
+          onClearFilters={handleClearFilters}
+        />
+      )}
 
       <CreateDishModal isOpen={createModal.isOpen} onClose={createModal.onClose} />
 
       <EditDishModal dish={editingDish} isOpen={editModal.isOpen} onClose={handleEditClose} />
 
-      <DeleteConfirmDialog dishId={deletingDish?.id ?? null} dishName={deletingDish?.name ?? ""} isOpen={deleteDialog.isOpen} onClose={handleDeleteClose} />
+      <DeleteConfirmDialog
+        dishId={deletingDish?.id ?? null}
+        dishName={deletingDish?.name ?? ""}
+        isOpen={deleteDialog.isOpen}
+        onClose={handleDeleteClose}
+      />
 
-      <RestoreConfirmDialog dishId={restoringDish?.id ?? null} dishName={restoringDish?.name ?? ""} isOpen={restoreDialog.isOpen} onClose={handleRestoreClose} />
+      <RestoreConfirmDialog
+        dishId={restoringDish?.id ?? null}
+        dishName={restoringDish?.name ?? ""}
+        isOpen={restoreDialog.isOpen}
+        onClose={handleRestoreClose}
+      />
 
-      <PermanentDeleteConfirmDialog dishId={permanentlyDeletingDish?.id ?? null} dishName={permanentlyDeletingDish?.name ?? ""} isOpen={permanentDeleteDialog.isOpen} onClose={handlePermanentDeleteClose} />
+      <PermanentDeleteConfirmDialog
+        dishId={permanentlyDeletingDish?.id ?? null}
+        dishName={permanentlyDeletingDish?.name ?? ""}
+        isOpen={permanentDeleteDialog.isOpen}
+        onClose={handlePermanentDeleteClose}
+      />
 
-      <AdjustStockModal dish={adjustingDish} isOpen={adjustStockModal.isOpen} onClose={handleAdjustStockClose} />
+      <AdjustStockModal
+        dish={adjustingDish}
+        isOpen={adjustStockModal.isOpen}
+        onClose={handleAdjustStockClose}
+      />
     </Box>
   );
 }

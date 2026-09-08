@@ -1,5 +1,15 @@
 import { useRef } from "react";
-import { AlertDialog, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, AlertDialogBody, AlertDialogFooter, AlertDialogCloseButton, Button, useToast } from "@chakra-ui/react";
+import {
+  AlertDialog,
+  AlertDialogOverlay,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogBody,
+  AlertDialogFooter,
+  AlertDialogCloseButton,
+  Button,
+  useToast,
+} from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { DishId } from "@sharons-kitchen/shared";
 import { updateDish } from "../services/inventoryService";
@@ -12,7 +22,12 @@ interface DeleteConfirmDialogProps {
   onClose: () => void;
 }
 
-export function DeleteConfirmDialog({ dishId, dishName, isOpen, onClose }: DeleteConfirmDialogProps) {
+export function DeleteConfirmDialog({
+  dishId,
+  dishName,
+  isOpen,
+  onClose,
+}: DeleteConfirmDialogProps) {
   const cancelRef = useRef<HTMLButtonElement>(null);
   const queryClient = useQueryClient();
   const toast = useToast();
@@ -36,11 +51,30 @@ export function DeleteConfirmDialog({ dishId, dishName, isOpen, onClose }: Delet
   });
 
   return (
-    <AlertDialog isOpen={isOpen} leastDestructiveRef={cancelRef} onClose={onClose} size={{ base: "sm", md: "md" }} closeOnOverlayClick>
+    <AlertDialog
+      isOpen={isOpen}
+      leastDestructiveRef={cancelRef}
+      onClose={onClose}
+      size={{ base: "sm", md: "md" }}
+      closeOnOverlayClick
+    >
       <AlertDialogOverlay>
-        <AlertDialogContent dir="rtl" bg="brand.50" color="gray.800" borderRadius="xl" overflow="hidden">
-          <AlertDialogHeader bg="brand.200" color="#2C1810" textAlign="center" fontSize="lg" fontWeight="bold"
-            borderBottom="2px solid" borderBottomColor="gray.400">
+        <AlertDialogContent
+          dir="rtl"
+          bg="brand.50"
+          color="gray.800"
+          borderRadius="xl"
+          overflow="hidden"
+        >
+          <AlertDialogHeader
+            bg="brand.200"
+            color="#2C1810"
+            textAlign="center"
+            fontSize="lg"
+            fontWeight="bold"
+            borderBottom="2px solid"
+            borderBottomColor="gray.400"
+          >
             מחיקת מנה 🗑️
           </AlertDialogHeader>
           <AlertDialogCloseButton color="#2C1810" />
@@ -55,7 +89,11 @@ export function DeleteConfirmDialog({ dishId, dishName, isOpen, onClose }: Delet
             <Button ref={cancelRef} variant="ghost" color="gray.600" onClick={onClose}>
               ביטול
             </Button>
-            <Button colorScheme="red" isLoading={mutation.isPending} onClick={() => mutation.mutate()}>
+            <Button
+              colorScheme="red"
+              isLoading={mutation.isPending}
+              onClick={() => mutation.mutate()}
+            >
               מחיקה
             </Button>
           </AlertDialogFooter>

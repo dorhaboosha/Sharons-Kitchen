@@ -1,6 +1,26 @@
 import { useEffect } from "react";
-import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, ModalCloseButton, Button, ButtonGroup, FormControl, FormLabel,
-  FormErrorMessage, NumberInput, NumberInputField, NumberInputStepper, NumberIncrementStepper, NumberDecrementStepper, VStack, Text, useToast } from "@chakra-ui/react";
+import {
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  ModalCloseButton,
+  Button,
+  ButtonGroup,
+  FormControl,
+  FormLabel,
+  FormErrorMessage,
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper,
+  NumberIncrementStepper,
+  NumberDecrementStepper,
+  VStack,
+  Text,
+  useToast,
+} from "@chakra-ui/react";
 import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -27,11 +47,17 @@ export function AdjustStockModal({ dish, isOpen, onClose }: AdjustStockModalProp
   const queryClient = useQueryClient();
   const toast = useToast();
 
-  const { control, handleSubmit, reset, watch, setError, formState: { errors } } =
-    useForm<AdjustStockFormData>({
-      resolver: zodResolver(AdjustStockFormSchema),
-      defaultValues: { direction: "add", amount: 1 },
-    });
+  const {
+    control,
+    handleSubmit,
+    reset,
+    watch,
+    setError,
+    formState: { errors },
+  } = useForm<AdjustStockFormData>({
+    resolver: zodResolver(AdjustStockFormSchema),
+    defaultValues: { direction: "add", amount: 1 },
+  });
 
   const direction = watch("direction");
 
@@ -40,11 +66,28 @@ export function AdjustStockModal({ dish, isOpen, onClose }: AdjustStockModalProp
       const delta = direction === "add" ? amount : -amount;
       return adjustStock(dish!.id, { delta });
     },
+    // Optimistic: bump the quantity in every cached list right away so the
+    // table reacts instantly. onSettled refetches the server truth (which also
+    // fixes ordering when sorting by quantity); onError rolls back.
+    onMutate: async ({ direction, amount }: AdjustStockFormData) => {
+      const delta = direction === "add" ? amount : -amount;
+      await queryClient.cancelQueries({ queryKey: [DISHES_QUERY_KEY] });
+      const snapshot = queryClient.getQueriesData<Dish[]>({ queryKey: [DISHES_QUERY_KEY] });
+
+      queryClient.setQueriesData<Dish[]>({ queryKey: [DISHES_QUERY_KEY] }, (list) =>
+        list?.map((d) =>
+          d.id === dish!.id && d.quantity + delta >= 0 ? { ...d, quantity: d.quantity + delta } : d,
+        ),
+      );
+
+      return { snapshot };
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [DISHES_QUERY_KEY] });
       handleClose();
     },
-    onError: (err: unknown) => {
+    onError: (err: unknown, _vars, context) => {
+      context?.snapshot?.forEach(([key, data]) => queryClient.setQueryData(key, data));
+
       if (err instanceof ApiClientError && err.code === "VALIDATION_ERROR") {
         setError("amount", { message: "הכמות להפחתה גדולה מהמלאי הקיים" });
       } else {
@@ -57,6 +100,9 @@ export function AdjustStockModal({ dish, isOpen, onClose }: AdjustStockModalProp
           position: "top",
         });
       }
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: [DISHES_QUERY_KEY] });
     },
   });
 
@@ -76,11 +122,23 @@ export function AdjustStockModal({ dish, isOpen, onClose }: AdjustStockModalProp
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} closeOnOverlayClick={true} size={{ base: "md", md: "lg" }}>
+    <Modal
+      isOpen={isOpen}
+      onClose={handleClose}
+      closeOnOverlayClick={true}
+      size={{ base: "md", md: "lg" }}
+    >
       <ModalOverlay />
       <ModalContent dir="rtl" bg="brand.50" color="gray.800" borderRadius="xl" overflow="hidden">
-        <ModalHeader bg="brand.200" color="#2C1810" textAlign="center" fontSize="xl" fontWeight="bold"
-          borderBottom="2px solid" borderBottomColor="gray.400">
+        <ModalHeader
+          bg="brand.200"
+          color="#2C1810"
+          textAlign="center"
+          fontSize="xl"
+          fontWeight="bold"
+          borderBottom="2px solid"
+          borderBottomColor="gray.400"
+        >
           עדכון מלאי 📦{dish ? ` — ${dish.name}` : ""}
         </ModalHeader>
         <ModalCloseButton color="#2C1810" />
@@ -99,12 +157,22 @@ export function AdjustStockModal({ dish, isOpen, onClose }: AdjustStockModalProp
                   control={control}
                   render={({ field }) => (
                     <ButtonGroup isAttached variant="outline" w="full">
-                      <Button flex={1} colorScheme="green" variant={field.value === "add" ? "solid" : "outline"} 
-                        onClick={() => field.onChange("add")} type="button">
+                      <Button
+                        flex={1}
+                        colorScheme="green"
+                        variant={field.value === "add" ? "solid" : "outline"}
+                        onClick={() => field.onChange("add")}
+                        type="button"
+                      >
                         הוספה
                       </Button>
-                      <Button flex={1} colorScheme="red" variant={field.value === "subtract" ? "solid" : "outline"}
-                        onClick={() => field.onChange("subtract")} type="button">
+                      <Button
+                        flex={1}
+                        colorScheme="red"
+                        variant={field.value === "subtract" ? "solid" : "outline"}
+                        onClick={() => field.onChange("subtract")}
+                        type="button"
+                      >
                         הפחתה
                       </Button>
                     </ButtonGroup>
@@ -113,26 +181,46 @@ export function AdjustStockModal({ dish, isOpen, onClose }: AdjustStockModalProp
               </FormControl>
 
               <FormControl isInvalid={!!errors.amount}>
-                <FormLabel color="gray.700">כמות {direction === "add" ? "להוספה" : "להפחתה"}</FormLabel>
+                <FormLabel color="gray.700">
+                  כמות {direction === "add" ? "להוספה" : "להפחתה"}
+                </FormLabel>
                 <Controller
                   name="amount"
                   control={control}
                   render={({ field }) => (
-                    <NumberInput min={1} value={field.value}
-                      onChange={(_, valueAsNumber) => field.onChange(isNaN(valueAsNumber) ? 1 : valueAsNumber)} dir="ltr">
-                      <NumberInputField textAlign="right" bg="white" color="gray.800" borderColor="gray.500"
-                        borderWidth="2px" _hover={{ borderColor: "gray.700" }}
-                        _focusVisible={{ borderColor: "gray.700", boxShadow: "none" }} />
+                    <NumberInput
+                      min={1}
+                      value={field.value}
+                      onChange={(_, valueAsNumber) =>
+                        field.onChange(isNaN(valueAsNumber) ? 1 : valueAsNumber)
+                      }
+                      dir="ltr"
+                    >
+                      <NumberInputField
+                        textAlign="right"
+                        bg="white"
+                        color="gray.800"
+                        borderColor="gray.500"
+                        borderWidth="2px"
+                        _hover={{ borderColor: "gray.700" }}
+                        _focusVisible={{ borderColor: "gray.700", boxShadow: "none" }}
+                      />
                       <NumberInputStepper border="none">
-                        <NumberIncrementStepper border="none" color="gray.600" _hover={{ bg: "transparent" }} />
-                        <NumberDecrementStepper border="none" color="gray.600" _hover={{ bg: "transparent" }} />
+                        <NumberIncrementStepper
+                          border="none"
+                          color="gray.600"
+                          _hover={{ bg: "transparent" }}
+                        />
+                        <NumberDecrementStepper
+                          border="none"
+                          color="gray.600"
+                          _hover={{ bg: "transparent" }}
+                        />
                       </NumberInputStepper>
                     </NumberInput>
                   )}
                 />
-                {errors.amount && (
-                  <FormErrorMessage>{errors.amount.message}</FormErrorMessage>
-                )}
+                {errors.amount && <FormErrorMessage>{errors.amount.message}</FormErrorMessage>}
               </FormControl>
             </VStack>
           </ModalBody>
@@ -141,7 +229,11 @@ export function AdjustStockModal({ dish, isOpen, onClose }: AdjustStockModalProp
             <Button variant="ghost" color="gray.600" onClick={handleClose}>
               ביטול
             </Button>
-            <Button type="submit" colorScheme={direction === "add" ? "green" : "red"} isLoading={mutation.isPending}>
+            <Button
+              type="submit"
+              colorScheme={direction === "add" ? "green" : "red"}
+              isLoading={mutation.isPending}
+            >
               {direction === "add" ? "הוספה" : "הפחתה"}
             </Button>
           </ModalFooter>

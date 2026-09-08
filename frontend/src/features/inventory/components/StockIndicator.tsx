@@ -23,7 +23,15 @@ export function StockIndicator({ quantity }: StockIndicatorProps) {
 
   return (
     <Tooltip label={label} placement="top" hasArrow>
-      <Box display="inline-block" w={3} h={3} borderRadius="full" bg={color} cursor="default" aria-label={label} />
+      <Box
+        display="inline-block"
+        w={3}
+        h={3}
+        borderRadius="full"
+        bg={color}
+        cursor="default"
+        aria-label={label}
+      />
     </Tooltip>
   );
 }

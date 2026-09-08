@@ -1,7 +1,16 @@
-import { FormControl, FormLabel, FormErrorMessage, Input, NumberInput, NumberInputField,
-  NumberInputStepper, NumberIncrementStepper, NumberDecrementStepper } from "@chakra-ui/react";
+import {
+  FormControl,
+  FormLabel,
+  FormErrorMessage,
+  Input,
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper,
+  NumberIncrementStepper,
+  NumberDecrementStepper,
+} from "@chakra-ui/react";
 import { UseFormRegister, FieldErrors, Controller, Control } from "react-hook-form";
-import { CreateDishData } from "@sharons-kitchen/shared";
+import { CreateDishData, agorotToShekels, shekelsToAgorot } from "@sharons-kitchen/shared";
 
 interface DishFormFieldsProps {
   register: UseFormRegister<CreateDishData>;
@@ -35,28 +44,41 @@ export function DishFormFields({ register, errors, control }: DishFormFieldsProp
         <FormErrorMessage>{errors.name?.message}</FormErrorMessage>
       </FormControl>
 
-      {/* Price — controlled so Chakra NumberInput shows/resets the RHF value correctly */}
-      <FormControl isInvalid={!!errors.price} isRequired>
+      {/* Price — typed in shekels, held in the form as agorot (integer) */}
+      <FormControl isInvalid={!!errors.priceAgorot} isRequired>
         <FormLabel {...LABEL_STYLES}>מחיר (₪)</FormLabel>
-        <Controller name="price" control={control} defaultValue={1} render={({ field }) => (
-            <NumberInput min={1} precision={0} dir="ltr" value={isNaN(field.value) ? "" : field.value}
-              onChange={(_, valueAsNumber) => field.onChange(isNaN(valueAsNumber) ? "" : valueAsNumber)}
-              onBlur={() => {
-                if (field.value === undefined || field.value === null || (field.value as unknown as string) === "" || isNaN(field.value) || field.value < 1) {
-                  field.onChange(1);
+        <Controller
+          name="priceAgorot"
+          control={control}
+          defaultValue={100}
+          render={({ field }) => {
+            const invalid = typeof field.value !== "number" || Number.isNaN(field.value);
+            return (
+              <NumberInput
+                min={1}
+                precision={2}
+                dir="ltr"
+                value={invalid ? "" : agorotToShekels(field.value)}
+                onChange={(_, valueAsNumber) =>
+                  field.onChange(Number.isNaN(valueAsNumber) ? NaN : shekelsToAgorot(valueAsNumber))
                 }
-                field.onBlur();
-              }}
-            >
-              <NumberInputField textAlign="right" {...INPUT_STYLES} />
-              <NumberInputStepper border="none">
-                <NumberIncrementStepper {...STEPPER_STYLES} />
-                <NumberDecrementStepper {...STEPPER_STYLES} />
-              </NumberInputStepper>
-            </NumberInput>
-          )}
+                onBlur={() => {
+                  if (invalid || field.value < 100) {
+                    field.onChange(100);
+                  }
+                  field.onBlur();
+                }}
+              >
+                <NumberInputField textAlign="right" {...INPUT_STYLES} />
+                <NumberInputStepper border="none">
+                  <NumberIncrementStepper {...STEPPER_STYLES} />
+                  <NumberDecrementStepper {...STEPPER_STYLES} />
+                </NumberInputStepper>
+              </NumberInput>
+            );
+          }}
         />
-        <FormErrorMessage>{errors.price?.message}</FormErrorMessage>
+        <FormErrorMessage>{errors.priceAgorot?.message}</FormErrorMessage>
       </FormControl>
 
       {/* Quantity — controlled; defaults to 1 and snaps back to 1 on blur if cleared */}
@@ -72,7 +94,9 @@ export function DishFormFields({ register, errors, control }: DishFormFieldsProp
               precision={0}
               dir="ltr"
               value={isNaN(field.value) ? "" : field.value}
-              onChange={(_, valueAsNumber) => field.onChange(isNaN(valueAsNumber) ? "" : valueAsNumber)}
+              onChange={(_, valueAsNumber) =>
+                field.onChange(isNaN(valueAsNumber) ? "" : valueAsNumber)
+              }
               onBlur={() => {
                 if (!field.value || isNaN(field.value) || field.value < 1) {
                   field.onChange(1);
@@ -94,9 +118,18 @@ export function DishFormFields({ register, errors, control }: DishFormFieldsProp
       {/* Units per box — optional; if a value is entered it must be ≥ 1 (corrected on blur) */}
       <FormControl isInvalid={!!errors.unitsPerBox}>
         <FormLabel {...LABEL_STYLES}>יחידות בקופסה</FormLabel>
-        <Controller name="unitsPerBox" control={control} render={({ field }) => (
-            <NumberInput min={1} precision={0} dir="ltr" value={field.value ?? ""}
-              onChange={(_, valueAsNumber) => field.onChange(isNaN(valueAsNumber) ? undefined : valueAsNumber)}
+        <Controller
+          name="unitsPerBox"
+          control={control}
+          render={({ field }) => (
+            <NumberInput
+              min={1}
+              precision={0}
+              dir="ltr"
+              value={field.value ?? ""}
+              onChange={(_, valueAsNumber) =>
+                field.onChange(isNaN(valueAsNumber) ? undefined : valueAsNumber)
+              }
               onBlur={() => {
                 if (field.value !== undefined && !isNaN(field.value) && field.value < 1) {
                   field.onChange(1);
@@ -117,7 +150,11 @@ export function DishFormFields({ register, errors, control }: DishFormFieldsProp
 
       <FormControl isInvalid={!!errors.description}>
         <FormLabel {...LABEL_STYLES}>תיאור</FormLabel>
-        <Input {...register("description")} placeholder="לדוגמה: קציצות ברוטב עגבניות" {...INPUT_STYLES} />
+        <Input
+          {...register("description")}
+          placeholder="לדוגמה: קציצות ברוטב עגבניות"
+          {...INPUT_STYLES}
+        />
         <FormErrorMessage>{errors.description?.message}</FormErrorMessage>
       </FormControl>
     </>

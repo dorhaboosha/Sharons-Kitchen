@@ -14,7 +14,15 @@ interface InventoryToolbarProps {
   onAddClick: () => void;
 }
 
-export function InventoryToolbar({ search, onSearchChange, filter, onFilterChange, sort, onSortChange, onAddClick }: InventoryToolbarProps) {
+export function InventoryToolbar({
+  search,
+  onSearchChange,
+  filter,
+  onFilterChange,
+  sort,
+  onSortChange,
+  onAddClick,
+}: InventoryToolbarProps) {
   return (
     <Flex mb={4} gap={3} wrap="wrap" align="center" justify="space-between">
       {/* Right group: search + filter + sort */}
@@ -32,7 +40,12 @@ export function InventoryToolbar({ search, onSearchChange, filter, onFilterChang
         </Box>
       </Flex>
 
-      <Button colorScheme="brand" flexShrink={0} w={{ base: "100%", md: "auto" }} onClick={onAddClick}>
+      <Button
+        colorScheme="brand"
+        flexShrink={0}
+        w={{ base: "100%", md: "auto" }}
+        onClick={onAddClick}
+      >
         הוספת מנה
       </Button>
     </Flex>
