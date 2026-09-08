@@ -85,16 +85,28 @@ npm run dev
 
 Three separate Render services:
 
-| Service                    | Type        | Notes                                                                                                                                                                                                     |
-| -------------------------- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `sharons-kitchen-db`       | PostgreSQL  | Internal connection string used by backend                                                                                                                                                                |
-| `sharons-kitchen-backend`  | Web Service | Build: `npm install && npm run build:shared && cd backend && npx prisma generate && cd .. && npm run build --workspace=backend` · Start: `cd backend && npx prisma migrate deploy && node dist/server.js` |
-| `sharons-kitchen-frontend` | Static Site | Build: `npm install && npm run build:shared && npm run build --workspace=frontend` · Publish: `frontend/dist`                                                                                             |
+| Service                    | Type                 | Notes                                                                                                           |
+| -------------------------- | -------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `sharons-kitchen-db`       | PostgreSQL           | Internal connection string used by backend                                                                      |
+| `sharons-kitchen-backend`  | Web Service (Docker) | Dockerfile: `backend/Dockerfile`, build context: repo root. The image runs `prisma migrate deploy` then starts. |
+| `sharons-kitchen-frontend` | Static Site          | Build: `npm install && npm run build:shared && npm run build --workspace=frontend` · Publish: `frontend/dist`   |
+
+Build the backend image locally with:
+
+```bash
+docker build -f backend/Dockerfile -t sharons-kitchen-backend .
+```
 
 **Environment variables required:**
 
-- Backend: `DATABASE_URL`, `FRONTEND_URL`, `API_ACCESS_TOKEN`, `NODE_ENV=production`, `NPM_CONFIG_PRODUCTION=false`
+- Backend: `DATABASE_URL`, `FRONTEND_URL`, `API_ACCESS_TOKEN`, `NODE_ENV=production`
 - Frontend: `VITE_API_URL`, `NPM_CONFIG_PRODUCTION=false`
+
+The backend image sets `NODE_ENV=production` and installs only production
+dependencies, so the old `NPM_CONFIG_PRODUCTION=false` workaround is no longer
+needed for it. The `prisma` CLI is a runtime dependency (used by
+`migrate deploy`). For a multi-instance deploy, move the migrate step to a
+Render pre-deploy command so instances don't race.
 
 The backend validates its environment on startup and exits with a clear message
 if `DATABASE_URL`, `FRONTEND_URL`, or `API_ACCESS_TOKEN` is missing/invalid in
