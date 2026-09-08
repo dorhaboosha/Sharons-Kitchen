@@ -15,7 +15,8 @@ backend/prisma/migrations/*.sql.bak
 
 # Project tooling / docs (local only)
 .cursor/
-docs/
+docs/*
+!docs/OPERATIONS.md
 openspec/
 AGENTS.md
 

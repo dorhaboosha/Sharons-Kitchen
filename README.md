@@ -86,6 +86,9 @@ cd .. && npm run dev
 
 ## Deployment (Render)
 
+Day-to-day operations — deploys, migrations, backups & restore, accounts,
+monitoring, incident playbook — are in [`docs/OPERATIONS.md`](docs/OPERATIONS.md).
+
 Three separate Render services:
 
 | Service                    | Type                 | Notes                                                                                                           |
