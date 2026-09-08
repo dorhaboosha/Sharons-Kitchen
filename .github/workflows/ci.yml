@@ -21,7 +21,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           # Don't leave the checkout token in .git/config where a postinstall
           # script from an untrusted PR could read it.
