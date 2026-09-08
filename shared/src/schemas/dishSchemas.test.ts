@@ -63,6 +63,11 @@ describe("UpdateDishSchema", () => {
   it("still allows description to be null", () => {
     expect(UpdateDishSchema.safeParse({ description: null }).success).toBe(true);
   });
+
+  it("enforces the same ₪1 price floor as CreateDishSchema", () => {
+    expect(UpdateDishSchema.safeParse({ priceAgorot: 99 }).success).toBe(false);
+    expect(UpdateDishSchema.safeParse({ priceAgorot: 100 }).success).toBe(true);
+  });
 });
 
 describe("GetDishesQuerySchema", () => {

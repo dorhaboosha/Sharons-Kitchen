@@ -120,15 +120,17 @@ if `DATABASE_URL` or `FRONTEND_URL` is missing/invalid in production.
 `FRONTEND_URL` must be the exact browser origin (scheme + host, no trailing
 slash).
 
-Create operator accounts against the production database with the shell of the
+Create operator accounts against the production database from the shell of the
 backend service (or locally with its `DATABASE_URL`):
 
 ```bash
 node dist/scripts/createUser.js
-# or non-interactively:
-CREATE_USER_EMAIL=you@example.com CREATE_USER_NAME="Your Name" \
-  CREATE_USER_PASSWORD='a-long-password' node dist/scripts/createUser.js
 ```
+
+The script prompts for email, name, and password (input hidden). It also reads
+`CREATE_USER_EMAIL` / `CREATE_USER_NAME` / `CREATE_USER_PASSWORD` if you need it
+non-interactive — but a password passed that way lands in your shell history and
+process list, so prefer the prompt.
 
 Every `git push` to `main` triggers an automatic redeploy of both services.
 

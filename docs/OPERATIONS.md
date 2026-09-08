@@ -178,14 +178,16 @@ pg_restore --clean --if-exists --no-owner --no-privileges \
 A backup you have never restored is not a backup.
 
 ```bash
-# spin up a throwaway local postgres
-docker run --rm -d --name sk-restore-test -e POSTGRES_PASSWORD=test \
-  -e POSTGRES_DB=sk -p 5544:5432 postgres:16
+# spin up a throwaway local postgres, bound to loopback only, random password
+PW=$(openssl rand -hex 16)
+docker run --rm -d --name sk-restore-test -e POSTGRES_PASSWORD="$PW" \
+  -e POSTGRES_DB=sk -p 127.0.0.1:5544:5432 postgres:16
 sleep 5
+URL="postgresql://postgres:$PW@localhost:5544/sk"
 pg_restore --clean --if-exists --no-owner --no-privileges \
-  --dbname "postgresql://postgres:test@localhost:5544/sk" sk-YYYYMMDD-HHMM.dump
+  --dbname "$URL" sk-YYYYMMDD-HHMM.dump
 # point the app at it and click around
-DATABASE_URL="postgresql://postgres:test@localhost:5544/sk" npm run dev --workspace=backend
+DATABASE_URL="$URL" npm run dev --workspace=backend
 # cleanup
 docker rm -f sk-restore-test
 ```
@@ -217,12 +219,13 @@ Backend service → **Shell**:
 
 ```bash
 node dist/scripts/createUser.js
-# or non-interactively:
-CREATE_USER_EMAIL=name@example.com CREATE_USER_NAME="Name" \
-  CREATE_USER_PASSWORD='a-long-password' node dist/scripts/createUser.js
 ```
 
-Password minimum is 10 characters (`shared/src/schemas/password.ts`).
+Prompts for email, name, and password (input hidden). `CREATE_USER_EMAIL` /
+`CREATE_USER_NAME` / `CREATE_USER_PASSWORD` are read if set, for non-interactive
+use — but a password passed that way is visible in shell history and process
+listings, so prefer the prompt. Password minimum is 10 characters
+(`shared/src/schemas/password.ts`).
 
 ### Disable / re-enable
 

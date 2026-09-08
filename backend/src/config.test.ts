@@ -33,6 +33,18 @@ describe("parseEnv", () => {
     expect(cfg.frontendUrl).toBe("https://sharons-kitchen-frontend.onrender.com");
   });
 
+  it("rejects a non-https FRONTEND_URL in production", () => {
+    expect(() => parseEnv({ ...prodBase, FRONTEND_URL: "http://example.com" })).toThrow(
+      /FRONTEND_URL/,
+    );
+  });
+
+  it("allows a non-https FRONTEND_URL outside production", () => {
+    expect(parseEnv({ ...base, FRONTEND_URL: "http://example.com" }).frontendUrl).toBe(
+      "http://example.com",
+    );
+  });
+
   it("strips a trailing slash from FRONTEND_URL so it matches the browser origin", () => {
     const cfg = parseEnv({ ...base, FRONTEND_URL: "https://example.com/" });
     expect(cfg.frontendUrl).toBe("https://example.com");

@@ -25,6 +25,17 @@ const EnvSchema = z
         message: "required in production (the browser origin allowed by CORS)",
       });
     }
+    if (
+      env.NODE_ENV === "production" &&
+      env.FRONTEND_URL &&
+      !env.FRONTEND_URL.startsWith("https://")
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["FRONTEND_URL"],
+        message: "must use https in production",
+      });
+    }
   });
 
 export interface AppConfig {

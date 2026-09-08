@@ -10,7 +10,7 @@ export const UpdateDishSchema = z
     priceAgorot: z
       .number({ invalid_type_error: "המחיר אינו תקין" })
       .int("המחיר אינו תקין")
-      .min(0, "המחיר לא יכול להיות שלילי")
+      .min(100, "המחיר חייב להיות לפחות ₪1")
       .max(10_000_000, "המחיר גבוה מדי")
       .optional(),
     quantity: z

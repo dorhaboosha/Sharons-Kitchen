@@ -4,6 +4,32 @@ import { getToken, clearToken } from "./auth";
 const BASE_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
 
 /**
+ * The bearer token is a real credential, so only attach it when the API origin
+ * is https or a local loopback address. A misconfigured `VITE_API_URL` pointing
+ * at plain http then fails loudly instead of leaking the token over the wire.
+ */
+const tokenTransportIsSafe = ((): boolean => {
+  try {
+    const { protocol, hostname } = new URL(BASE_URL);
+    return (
+      protocol === "https:" ||
+      hostname === "localhost" ||
+      hostname === "127.0.0.1" ||
+      hostname === "[::1]" ||
+      hostname === "::1"
+    );
+  } catch {
+    return false;
+  }
+})();
+
+if (!tokenTransportIsSafe) {
+  console.warn(
+    `VITE_API_URL (${BASE_URL}) is not https or loopback — the session token will not be sent.`,
+  );
+}
+
+/**
  * Every code an {@link ApiClientError} can carry: the ones the API returns in
  * its error envelope, plus `NETWORK_ERROR` for client-side failures (the
  * request never completed, or the response body wasn't a valid envelope — a
@@ -50,7 +76,7 @@ export async function apiFetch<T>(path: string, options: RequestInit = {}): Prom
   const headers = new Headers(options.headers);
   headers.set("Content-Type", "application/json");
   const token = getToken();
-  if (token) headers.set("Authorization", `Bearer ${token}`);
+  if (token && tokenTransportIsSafe) headers.set("Authorization", `Bearer ${token}`);
 
   let res: Response;
   try {

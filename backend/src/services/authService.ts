@@ -21,12 +21,9 @@ export function hashPassword(password: string): Promise<string> {
 
 // A valid argon2 hash of a throwaway value. When a login names an unknown
 // account we still run a verify against this, so a missing user and a wrong
-// password take the same time.
-let decoyHash: string | null = null;
-async function getDecoyHash(): Promise<string> {
-  if (!decoyHash) decoyHash = await argon2Hash(randomBytes(16).toString("hex"));
-  return decoyHash;
-}
+// password take the same time. Computed once at module load (before the server
+// starts listening) so the first unknown-email login pays no extra cost.
+const decoyHashPromise: Promise<string> = argon2Hash(randomBytes(16).toString("hex"));
 
 function toAuthUser(u: { id: number; email: string; displayName: string }): AuthUser {
   return { id: u.id, email: u.email, displayName: u.displayName };
@@ -45,7 +42,7 @@ export async function login(
 ): Promise<{ token: string; user: AuthUser }> {
   const user = await prisma.user.findUnique({ where: { email } });
 
-  const hashToCheck = user?.passwordHash ?? (await getDecoyHash());
+  const hashToCheck = user?.passwordHash ?? (await decoyHashPromise);
   const passwordOk = await argon2Verify(hashToCheck, password).catch(() => false);
 
   if (!user || !user.isActive || !passwordOk) {
