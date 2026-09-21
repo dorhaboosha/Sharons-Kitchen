@@ -21,12 +21,13 @@ async function prompt(question: string, opts: { silent?: boolean } = {}): Promis
   try {
     if (!opts.silent) return (await rl.question(question)).trim();
 
-    // Mute echo while typing a password.
+    // Show the prompt first, then mute echo while the password is typed.
+    stdout.write(question);
     const mutableOut = stdout as unknown as { write: (chunk: string) => boolean };
     const realWrite = mutableOut.write.bind(mutableOut);
     mutableOut.write = (chunk: string) => (/\n/.test(chunk) ? realWrite(chunk) : true);
     try {
-      const answer = await rl.question(question);
+      const answer = await rl.question("");
       realWrite("\n");
       return answer.trim();
     } finally {
