@@ -18,10 +18,10 @@
     "create-user": "dotenv -e ../.env -- ts-node src/scripts/createUser.ts"
   },
   "dependencies": {
-    "@node-rs/argon2": "^2.2.0",
+    "@node-rs/argon2": "^2.2.1",
     "@prisma/client": "^6.6.0",
     "@sharons-kitchen/shared": "*",
-    "compression": "^1.8.0",
+    "compression": "^1.8.2",
     "cors": "^2.8.5",
     "express": "^4.21.2",
     "express-rate-limit": "^7.5.0",
