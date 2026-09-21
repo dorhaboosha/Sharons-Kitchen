@@ -12,22 +12,27 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@chakra-ui/react": "^2.10.5",
+    "@chakra-ui/react": "^2.10.10",
     "@emotion/react": "^11.13.5",
     "@emotion/styled": "^11.13.5",
     "@hookform/resolvers": "^3.10.0",
     "@sharons-kitchen/shared": "*",
-    "@tanstack/react-query": "^5.102.8",
+    "@tanstack/react-query": "^5.103.1",
     "framer-motion": "^13.4.0",
     "react": "^18.3.1",
     "react-dom": "^19.3.0",
     "react-hook-form": "^7.87.0",
+    "react": "^19.3.0",
+    "react-dom": "^18.3.1",
+    "react-hook-form": "^7.88.0",
     "react-router-dom": "^7.18.4",
     "zod": "^3.24.0"
   },
   "devDependencies": {
     "@types/react": "^18.3.20",
     "@types/react-dom": "^19.3.0",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^18.3.5",
     "@vitejs/plugin-react": "^4.3.4",
     "typescript": "^7.0.2",
     "vite": "^6.2.6"
