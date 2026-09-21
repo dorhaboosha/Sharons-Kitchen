@@ -26,6 +26,13 @@ updates:
         update-types: ["version-update:semver-major"]
       - dependency-name: "@prisma/client"
         update-types: ["version-update:semver-major"]
+      # Chakra UI v3 is a ground-up rewrite (Modal/AlertDialog/Table/
+      # NumberInput/Switch/Tooltip/Select, FormControl->Field, useToast,
+      # isOpen/isLoading/spacing prop renames, extendTheme replaced by
+      # createSystem) touching nearly every component in the app — a full UI
+      # migration, not a bump. Keep getting 2.x patch/minor updates.
+      - dependency-name: "@chakra-ui/react"
+        update-types: ["version-update:semver-major"]
 
   # Keep GitHub Actions in the CI workflow up to date
   - package-ecosystem: github-actions
