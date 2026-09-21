@@ -17,6 +17,22 @@ updates:
       prod-minor-patch:
         dependency-type: production
         update-types: ["minor", "patch"]
+    ignore:
+      # Prisma 7 drops inline `datasource.url` in schema.prisma in favor of a
+      # driver adapter + prisma.config.ts — a deliberate migration, not a
+      # routine bump. Keep getting 6.x patch/minor updates; revisit the major
+      # version by hand when there's time to test it properly.
+      - dependency-name: "prisma"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@prisma/client"
+        update-types: ["version-update:semver-major"]
+      # Chakra UI v3 is a ground-up rewrite (Modal/AlertDialog/Table/
+      # NumberInput/Switch/Tooltip/Select, FormControl->Field, useToast,
+      # isOpen/isLoading/spacing prop renames, extendTheme replaced by
+      # createSystem) touching nearly every component in the app — a full UI
+      # migration, not a bump. Keep getting 2.x patch/minor updates.
+      - dependency-name: "@chakra-ui/react"
+        update-types: ["version-update:semver-major"]
 
   # Keep GitHub Actions in the CI workflow up to date
   - package-ecosystem: github-actions
