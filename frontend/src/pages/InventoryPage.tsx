@@ -7,12 +7,10 @@ import {
   Button,
   Flex,
   Heading,
-  HStack,
-  Text,
   useDisclosure,
 } from "@chakra-ui/react";
 import { Dish, DishId, GetDishesQueryData } from "@sharons-kitchen/shared";
-import { useAuth } from "../app/AuthProvider";
+import { UserMenu } from "../features/auth/UserMenu";
 import { useDebouncedValue } from "../hooks/useDebouncedValue";
 import { useInventory } from "../features/inventory/hooks/useInventory";
 import { InventoryToolbar } from "../features/inventory/components/InventoryToolbar";
@@ -27,7 +25,6 @@ import { PermanentDeleteConfirmDialog } from "../features/inventory/components/P
 import { SortValue } from "../features/inventory/components/SortControls";
 
 export function InventoryPage() {
-  const { user, logout } = useAuth();
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<GetDishesQueryData["filter"]>("all");
   const [sort, setSort] = useState<SortValue>("");
@@ -126,20 +123,25 @@ export function InventoryPage() {
 
   return (
     <Box maxW="1200px" mx="auto" px={{ base: 3, md: 6 }} py={{ base: 4, md: 8 }} dir="rtl">
-      <Flex align="center" mb={8} position="relative">
+      {/* On phones the account menu sits on its own row above the title so the
+          full greeting never overlaps it; from md up it is pinned beside it. */}
+      <Flex
+        direction={{ base: "column", md: "row" }}
+        align="center"
+        gap={{ base: 2, md: 0 }}
+        mb={8}
+        position="relative"
+      >
+        <Box
+          position={{ base: "static", md: "absolute" }}
+          insetInlineEnd={{ md: 0 }}
+          alignSelf={{ base: "flex-end", md: "auto" }}
+        >
+          <UserMenu />
+        </Box>
         <Heading size="2xl" textAlign="center" flex="1">
           ניהול מלאי
         </Heading>
-        <HStack spacing={3} position="absolute" insetInlineEnd={0}>
-          {user && (
-            <Text fontSize="sm" color="gray.600" display={{ base: "none", sm: "block" }}>
-              {user.displayName}
-            </Text>
-          )}
-          <Button size="sm" variant="ghost" colorScheme="brand" onClick={() => void logout()}>
-            יציאה
-          </Button>
-        </HStack>
       </Flex>
 
       <InventoryToolbar
